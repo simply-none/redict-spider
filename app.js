@@ -9,7 +9,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-require('./dict')
+require('./dict-wordreference')
 
 // require('./readfile')
 
@@ -24,6 +24,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/dictionary.cambridge.org', express.static(path.join(__dirname, 'dictionary.cambridge.org')));
+app.use('/wordreference.com', express.static(path.join(__dirname, 'wordreference.com')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

@@ -11,6 +11,12 @@ node_modules
 dictionary.cambridge.org/html/
 dictionary.cambridge.org/json/
 
+
+wordreference.com/html/
+wordreference.com/json/
+wordreference.com/*.html
+
+
 .DS_Store
 dist-ssr
 coverage
