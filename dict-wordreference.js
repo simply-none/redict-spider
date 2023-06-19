@@ -11,7 +11,7 @@ var cihui = require('./cihui')
 
 require('colors')
 
-let notFoundCihui = require('./没有查到的词汇总.json')
+let notFoundCihui = require('./没有查到的词汇总wordreference.json')
 
 let notFoundCihuiF = []
 
@@ -27,8 +27,12 @@ Object.keys(notFoundCihui).forEach(arr => {
 
 const startTime = Date.now()
 
+function delSpace (str) {
+  return str.replace(/^\s+|\s+$/g,"")
+}
+
 const c = new Crawler({
-  rateLimit: 200,
+  rateLimit: 10,
   headers: {
     'Cookie': '_gid=GA1.2.1269905276.1687082416; xf_csrf=RMZOxR--W8CiQdKd; xf_language_id=10; xf_language_set=1; llang=enzhi; _ga=GA1.1.33121290.1686406213; _ga_WV46ZWEMKW=GS1.1.1687088903.3.1.1687090020.59.0.0',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
@@ -46,6 +50,14 @@ const c = new Crawler({
     }
     done();
   }
+});
+
+
+c.on('drain', () => {
+  // For example, release a connection to database.
+  console.log('\n\n\-----------------------------------'.red)
+  console.log('------------------任务调用完成---------'.red)
+  console.log('-----------------------------------\n\n'.red)
 });
 
 
@@ -70,22 +82,18 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
   }
 
   cihui.cihui.forEach((cihui, index) => {
-    if (index > 0) {
-      return false
-    }
 
     if (notFoundCihuiF.includes(cihui)) {
       console.log('\n')
       console.log('------------------请求开始---------------------', cihui.red, index.toString().green)
       console.log('该单词位于未查到的词的文件中', cihui)
       test.not++
-      console.log(JSON.stringify(test).bgBlue)
+      // console.log(JSON.stringify(test).bgBlue)
       // return true
     }
 
     let url = encodeURI('https://www.wordreference.com/enzh/' + cihui)
 
-    let reci = redirectCihui.find(ci => ci.cihui === cihui)
 
     if (rawDataq.find(ci => ci === cihui)) {
       url = encodeURI('http://localhost:3000/wordreference.com/html/' + cihui + '.html')
@@ -93,44 +101,27 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
       console.log('\n')
       console.log('------------------请求开始---------------------', cihui.red, index.toString().green)
       test.local++
-      console.log(JSON.stringify(test).bgBlue)
+      // console.log(JSON.stringify(test).bgBlue)
       console.log('该单词以完成本地存储，将自动跳过', cihui)
 
       // return true
 
-    } else if (reci) {
-      url === encodeURI('http://localhost:3000/wordreference.com/html/' + reci.redirect + '.html')
-
-      console.log('\n')
-      console.log('------------------请求开始---------------------', cihui.red, index.toString().green)
-      test.local++
-      console.log(JSON.stringify(test).bgBlue)
-      console.log('重定向词汇', cihui)
-
-
     }
     c.queue([{
-      // uri: url,
-      uri: 'http://localhost:3000/wordreference.com/wordreference.test.get up copy.html',
+      uri: url,
+      // uri: 'http://localhost:3000/wordreference.com/html/get up.html',
       // uri: encodeURI('https://www.wordreference.com/enzh/' + 'against'),
       jQuery: true,
       callback: (error, res, done) => {
         test.req++
         console.log(JSON.stringify(test).bgBlue)
         console.log('\n')
-        console.log('------------------请求开始---------------------', cihui.red, index.toString().green)
-        console.log(res.request.uri.href, url, '当前请求的url')
+        console.log('------------------请求开始---------------------'.bgGreen, cihui.red, index.toString().green)
+        console.log(res.request.uri.href, '当前请求的url')
         if (error) {
           console.log(error);
         } else {
           let $ = res.$;
-
-          fs.writeFileSync('./wordreference.test.' + (cihui || 'default_test_cihui') + '.html', res.body, function (err) {
-            if (err) {
-              return console.error(err);
-            }
-            console.log("数据写入成功！-----html源码", new Date());
-          });
 
           console.log('源码大小', res.body.length, 'bytes');
 
@@ -161,9 +152,13 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
 
             let fayin = dictHead.find('#listen_widget script')
 
-            // console.log(fayin.text())
+            let fayinstr = []
 
-            let fayinstr = eval(fayin.text() + ';audioFiles;')
+            try {
+              fayinstr = eval(fayin.text() + ';audioFiles;')
+            } catch {
+              fayinstr = []
+            }
 
             // 发音相关
             let pronunciation = {}
@@ -211,7 +206,6 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
 
               let kk = ukinthis.split(ukinthisinn)[1]
 
-              // console.log(kk.red, 'kk'.green)
               phoneticukword.push(kk)
 
             })
@@ -223,37 +217,21 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
 
               let kk = ukinthis.split(ukinthisinn)[1]
 
-              // console.log(kk.red, 'kk'.green)
               phoneticukwordus.push(kk)
 
             })
 
-            // console.log(phoneticukword, phoneticukwordus, 'kk'.red)
-
             pronunciation.uk && (pronunciation.uk.phonetic = phoneticukword.join(', '))
             pronunciation.us && (pronunciation.us.phonetic = phoneticukwordus.join(', '))
-
-            // console.log(JSON.stringify(pronunciation), 'kk'.red)
 
             cihuiCommon.pronunciation = pronunciation
 
             // 至此，dsense之前的内容完成
 
-            // console.log(phonetic, Date.toString().red)
-
-
-            // console.log(fayinstr)
-            // return 
-
-            let dancisimple = {
-              name: dictheadname.text()
-            }
           }
 
 
           if (!dictBody) {
-
-            console.log('jinleil'.red)
 
             let status = '当前词汇未查到'
 
@@ -261,8 +239,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               cihui,
               status
             }
-
-            fs.appendFile('./没有查到的词' + '.txt', JSON.stringify(appendStatus) + ',\n', function (err) {
+            fs.appendFile('./没有查到的词wrodreference' + '.txt', JSON.stringify(appendStatus) + ',\n', function (err) {
               if (err) throw err;
               console.log('当前词汇未查到', cihui);
             });
@@ -272,335 +249,169 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
 
             let fenleicihui = dictBody.find('.WRD')
 
-            // console.log(fenleicihui, 'kkk'.red)
+            let bigdata = []
 
             fenleicihui.each(function (index) {
               let id = $(this).attr('id') || ''
-              console.log('id', id)
 
               // 解释，词组，短语等
-              // let tbodytr = $(this)[0].find('tr td')
-              // console.log('\n\n\n\n\n\n', 'kk'.green, $(this)[0], 'jfkas'.red)
-              // console.log($(this).children()[0])
-
               let pinjietrl = []
+
 
               let listcihuia = []
 
               let lastOddeven = ''
 
-              let jflawe = $(this).children()
-              // console.log(jflawe, 'length')
+              // 单词获取
 
-              console.log(jflawe.length, jflawe[0].name,  'child')
+              let getsingalcihui = {}
+
+              let jflawe = $(this).children()
 
               jflawe.each(function (index) {
-                // console.log($(this), 'fjalejwaofwef', index)
-
-                const trtttt = $(this)
-
-                trtttt.each(function (index) {
-                  // console.log($(this).length, index.toString().red, $(this).attr())
 
                   let trl = $(this)
 
                   let idenzh = trl.attr('class')
 
-
-
                   if (!lastOddeven && ['odd', 'even'].includes(idenzh)) {
                     lastOddeven = idenzh
                   }
 
-
-
-                  // console.log('jousindea'.red)
-
                   if (lastOddeven !== idenzh) {
+                    getsingalcihui.trans_examp = getsingalcihui.trans_examp || {}
+                    getsingalcihui.trans_examp.example = getsingalcihui.trans_examp.example || [{}]
+                    getsingalcihui.trans_examp.trans_cn = pinjietrl.filter(l => delSpace(l)).join(', ')
+                    getsingalcihui.trans_examp = [getsingalcihui.trans_examp]
+                    listcihuia.push(getsingalcihui)
+                    getsingalcihui = {}
                     pinjietrl = []
                     lastOddeven = idenzh
                     let FrWrd = $(this).find('.FrWrd')
 
                     let FrWrdname = FrWrd.find('strong')
-                    let FrWrdprep = FrWrd.find('.POS2').text()
+                    let FrWrdprep = FrWrd.find('.POS2')
 
-                    let guidjlaf = $(this).find('td')
 
-                    let FrWrdfanyi = $(this).find(".zhgroup")
+                    // 获取没有class的元素--------------------
+                    let guidjlaf = $(this).find('td:not([class])')
 
-                    console.log($(this)[0].name, new Date())
+                    let FrWrdfanyi = $(this).find(".zhgroup:nth-child(1)")
 
-                    // console.log('jousindea'.red)
-                    pinjietrl.push()
+
+                    let FrWrdfanyi1 = FrWrdfanyi.find('>span')
+
+                    let FrWrdfanyitext = FrWrdfanyi.text()
+
+                    FrWrdfanyi1.each(function () {
+
+                      let thisText = $(this).text()
+
+                      FrWrdfanyitext = FrWrdfanyitext.replace(thisText, '')
+                    })
+
+                    FrWrdfanyitext = delSpace(FrWrdfanyitext)
+
+                    pinjietrl.push(FrWrdfanyitext)
+
+                    getsingalcihui.name = FrWrdname.text()
+                    getsingalcihui.pos = FrWrdprep.text()
+                    getsingalcihui.guideword = guidjlaf.text()
+
+                  } else if (lastOddeven === idenzh) {
+                    let FrWrdfanyi = $(this).find(".zhgroup:nth-child(1)")
+
+
+                    // 获取子元素节点---------------------
+                    let FrWrdfanyi1 = FrWrdfanyi.find('>span')
+
+                    let FrWrdfanyitext = FrWrdfanyi.text()
+                    
+                    FrWrdfanyi1.each(function () {
+
+                      let thisText = $(this).text()
+                      FrWrdfanyitext = FrWrdfanyitext.replace(thisText, '')
+                    })
+
+                    FrWrdfanyitext = delSpace(FrWrdfanyitext)
+
+                    pinjietrl.push(FrWrdfanyitext)
+
+                    let fanyitore = $(this).find('.FrEx')
+                    let fanyitoex = $(this).find('.ToEx')
+
+                    getsingalcihui.trans_examp = getsingalcihui.trans_examp || {}
+                    getsingalcihui.trans_examp.example = getsingalcihui.trans_examp.example || [{}]
+
+                    let lenexample = getsingalcihui.trans_examp.example.length
+
+                    let lastexample = getsingalcihui.trans_examp.example[lenexample - 1] || {}
+
+                    !lastexample.eg && (lastexample.eg = fanyitore.text() || '')
+                    !lastexample.egtrans && (lastexample.egtrans = fanyitoex.text() || '')
+
+                    getsingalcihui.trans_examp.example[lenexample - 1] = lastexample
+
+                    let nextthis = $(this).next()
+
+                    // 最后一个元素，没有兄弟节点，则存值
+                    if (!nextthis || !nextthis[0] || !nextthis[0].name) {
+                      getsingalcihui.trans_examp.trans_cn = pinjietrl.filter(l => l).filter(l => delSpace(l)).join(', ')
+                      getsingalcihui.trans_examp = [getsingalcihui.trans_examp]
+                      listcihuia.push(getsingalcihui)
+                    }
                   }
-
-
-
-                  if (lastOddeven === idenzh) {
-
-                  }
-
-
-
-
-
-                  // index === 30 && console.log(trl.attr('class').red, 'red')
-
-
-
-                  if (idenzh && idenzh.includes('enzh:')) {
-                    listcihuia.push(pinjietrl)
-                    pinjietrl = []
-                  }
-                })
-
-
-
-                // index === 30 && console.log($(this)[0].name, 'ja'.rainbow)
               })
 
-              // console.log(akfa, 'akfa'.red)
 
-              index === 0 && fs.writeFileSync('./测试wored.test.' + (cihui || 'default_test_cihui') + '.html', $(this).html(), function (err) {
-                if (err) {
-                  return console.error(err);
-                }
-                console.log("数据写入成功！-----html源码", new Date());
-              });
+              bigdata.push({
+                ...cihuiCommon,
+                dsense: listcihuia.filter(l => l.name)
+              })
+
             })
 
-            const list = []
+            // 测试用 写入文件操作
+            // fs.writeFileSync('./测试wored.test.json' + (cihui || 'default_test_cihui') + '.json', JSON.stringify(bigdata), function (err) {
+            //   if (err) {
+            //     return console.error(err);
+            //   }
+            //   console.log("数据写入成功！-----html源码", new Date());
+            // });
 
-            // 针对单词
-            let cidiantiaomuList = dictBody.find(".WRD.clickTranslate.noTapHighlight")
+            if (!bigdata.length) {
 
-            if (cidiantiaomuList.length === 0) {
-              // 针对短语
-              cidiantiaomuList = dictBody.find(".entry-body__el")
-            }
-
-            cidiantiaomuList.each(function (index, element) {
-              const posHeader = $(this).find('.pos-header')
-              // 标题
-              const dict_title = posHeader.find('.di-title').text()
-              // 类型
-              const type = posHeader.find('.posgram')
-              // 类型说明
-              const typeTitle = type.find('.pos')
-              // 发音
-              const fayin = posHeader.find('.dpron-i')
-              const fayinObj = {}
-              fayin.each(function (index) {
-                const ukus = $(this).find('.region')
-
-                const source = $(this).find('audio source')
-
-                const xiefa = $(this).find('.pron.dpron')
-
-                const sourceDesc = []
-                source.each(function (index, element) {
-                  sourceDesc.push($(this).attr())
-                })
-                let ukusFlag = 'not-uk-us'
-                if (ukus.text().includes('uk')) {
-                  ukusFlag = 'uk'
-                }
-                if (ukus.text().includes('us')) {
-                  ukusFlag = 'us'
-                }
-                fayinObj[ukusFlag] = {
-                  // 音标源
-                  source: sourceDesc,
-                  // 音标
-                  phonetic: xiefa.text(),
-                  // 英 or 美
-                  class: ukusFlag
-                }
-              })
-
-              // -----------------pos body--------------------
-              const posBody = $(this).find('.pos-body .pr.dsense')
-              const dsense = []
-              posBody.each(function () {
-                const typeF = $(this).find('.hw.dsense_hw').text()
-                const pos = $(this).find('.pos.dsense_pos').text()
-                const posTip = $(this).find('.pos.dsense_pos').attr('title')
-                const guideword = $(this).find('.guideword.dsense_gw').text()
-
-                // dsense body
-                let dsense_body_def_block_k = []
-                const dsense_body_def_block = $(this).find('.sense-body.dsense_b>.def-block.ddef_block')
-                dsense_body_def_block.each(function () {
-                  const ddef_h = $(this).find('.ddef_h')
-                  const epp_xref = ddef_h.find('.epp-xref')
-                  const gram = ddef_h.find('.gram')
-                  const def = ddef_h.find('.def.ddef_d.db')
-
-                  const ddef_b = $(this).find('.def-body.ddef_b')
-                  const ddef_b_trans = ddef_b.children(".trans")
-
-                  const ddef_b_example = ddef_b.find('.examp')
-                  const example = []
-                  ddef_b_example.each(function () {
-                    const eg = $(this).find('.eg')
-                    const egtrans = $(this).find('.trans')
-                    example.push({
-                      eg: eg.text(),
-                      egtrans: egtrans.text()
-                    })
-                  })
-
-                  dsense_body_def_block_k.push({
-                    // 英语等级，相当于难易程度，https://www.abaenglish.com/zh/levels/
-                    level: epp_xref.text(),
-                    // 二级词性分类，比如名词，有可数和不可数,https://wordreference.com/zhs/help/codes.html
-                    pos_2: gram.text(),
-                    trans_en: def.text(),
-                    trans_cn: ddef_b_trans.text(),
-                    example
-                  })
-                })
-
-                // pr phrase-block dphrase-block 
-                const phrase = []
-                const dsense_phrase_block = $(this).find('.pr.phrase-block.dphrase-block')
-                dsense_phrase_block.each(function () {
-                  let phrase_head = $(this).find('.phrase-head.dphrase_h')
-                  let phrase_title = phrase_head.find('.phrase-title.dphrase-title')
-
-                  let phrase_body = $(this).find('.phrase-body.dphrase_b')
-                  // dsense body
-                  let dsense_body_def_block_kk = []
-                  const dsense_body_def_block = phrase_body.find('.def-block.ddef_block')
-                  dsense_body_def_block.each(function () {
-                    const ddef_h = $(this).find('.ddef_h')
-                    const epp_xref = ddef_h.find('.epp-xref')
-                    const gram = ddef_h.find('.gram')
-                    const def = ddef_h.find('.def.ddef_d.db')
-
-                    const ddef_b = $(this).find('.def-body.ddef_b')
-                    const ddef_b_trans = ddef_b.children(".trans")
-
-                    const ddef_b_example = ddef_b.find('.examp')
-                    const example = []
-                    ddef_b_example.each(function () {
-                      const eg = $(this).find('.eg')
-                      const egtrans = $(this).find('.trans')
-                      example.push({
-                        eg: eg.text(),
-                        egtrans: egtrans.text()
-                      })
-                    })
-
-                    dsense_body_def_block_kk.push({
-                      def_info: {
-                        epp_xref: epp_xref.text(),
-                        gram: gram.text()
-                      },
-                      def: def.text(),
-                      ddef_b_trans: ddef_b_trans.text(),
-                      example
-                    })
-                  })
-
-                  phrase.push({
-                    phrase_title: phrase_title.text(),
-                    dsense_body_def_block_kk
-                  })
-
-                })
-
-                const dense = {
-                  name: typeF,
-                  // 词性
-                  pos,
-                  // 解释词性pos的作用
-                  posTip,
-                  // 帮助理解该单词意思
-                  guideword,
-                  // 翻译和例句
-                  trans_examp: dsense_body_def_block_k,
-                  // 短语
-                  phrase
-                }
-
-                dsense.push(dense)
-
-              })
-
-              const data = {
-                name: dict_title,
-                pos: type.text(),
-                posTip: typeTitle.attr('title'),
-                pronunciation: fayinObj,
-                dsense
-              }
-
-              let status = dict_title ? dict_title : '单词标题为空'
+              let status = '当前词汇未查到'
 
               let appendStatus = {
                 cihui,
                 status
               }
 
-              if (status === '单词标题为空') {
-                fs.appendFile('./没有查到的词' + '.txt', JSON.stringify(appendStatus) + ',\n', function (err) {
-                  if (err) throw err;
-                  console.log('当前词汇未查到', cihui);
-                });
-              }
-
-
-              list.push(data)
-            })
-
-            // console.log(list[0].title)
-
-            if (list[0] && list[0].title !== cihui && list[0].title) {
-
-              var fileNameEnd = list[0].title
-
-
-              let status = '重定向单词，原单词未查到'
-
-              let appendStatus = {
-                cihui,
-                status,
-                redirect: fileNameEnd
-              }
-
-              fs.appendFile('./没有查到的词' + '.txt', JSON.stringify(appendStatus) + ',\n', function (err) {
+              fs.appendFile('./没有查到的词wrodreference' + '.txt', JSON.stringify(appendStatus) + ',\n', function (err) {
                 if (err) throw err;
                 console.log('当前词汇未查到', cihui);
               });
-
-              fs.writeFileSync('./wordreference.com/json/' + (fileNameEnd || 'default_test_cihui') + '.json', JSON.stringify(list), function (err) {
-                if (err) {
-                  return console.error(err);
-                }
-                console.log("数据写入成功！-----词汇数据，非源单词，跳转单词");
-              });
-              !url.includes('localhost') && fs.writeFileSync('./wordreference.com/html/' + (fileNameEnd || 'default_test_cihui') + '.html', res.body, function (err) {
-                if (err) {
-                  return console.error(err);
-                }
-                console.log("数据写入成功！-----html源码，非源单词，跳转单词", new Date());
-              });
+              
             }
 
-            fs.writeFileSync('./wordreference.com/json/' + (cihui || 'default_test_cihui') + '.json', JSON.stringify(list), function (err) {
+            fs.writeFile('./wordreference.com/json/' + (cihui || 'default_test_cihui') + '.json', JSON.stringify(bigdata), function (err) {
               if (err) {
                 return console.error(err);
               }
 
-              const time = ((Date.now() - startTime) / 1000 > 60) ? (Math.floor(((Date.now() - startTime) / 1000) / 60) + 'm' + ((Date.now() - startTime) / 1000) % 60 + 's') : ((Date.now() - startTime) / 1000)
+              let endTimeS = Date.now()
 
-              const endTime = '已运行' + time + 's'
+              const timeM = Math.floor(((endTimeS - startTime) / 1000) / 60) ? Math.floor(((endTimeS - startTime) / 1000) / 60) + ' 分 ' : ''
+              const timeS = Math.floor((endTimeS - startTime) / 1000 % 60) ? Math.floor((endTimeS - startTime) / 1000 % 60) + ' 秒 ' : ''
+              const timeMS = ((endTimeS - startTime) % 1000) + ' 毫秒'
+
+              const endTime = '已运行' + timeM + timeS + timeMS
               console.log("数据写入成功！-----词汇数据-----", endTime.red, (count++).toString().green);
             });
 
 
-            !url.includes('localhost') && fs.writeFileSync('./wordreference.com/html/' + (cihui || 'default_test_cihui') + '.html', res.body, function (err) {
+            !url.includes('localhost') && fs.writeFile('./wordreference.com/html/' + (cihui || 'default_test_cihui') + '.html', res.body, function (err) {
               if (err) {
                 return console.error(err);
               }
