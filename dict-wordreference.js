@@ -1,29 +1,17 @@
 const Crawler = require('crawler');
 var fs = require("fs");
 
+// 词源：需要进行查询的单词文件，格式是{cihui: []}
+var cihui = require('./searching-words')
 
-// 词源
-var cihui = require('./cihui')
+// 所有的单词-当前已经查询过的，包括notfound
+var all_words = require('./勿删-单词文件表wordreferencecom')
 
 // 词性：part of speech
 // var POS = 
 // 名词(none)、 动词(verb)、 形容词(adjective)、 副词(adverb)、 冠词(article)、 代词(pronoun)、 数词(numeral)、介词(preposition)、 连词(conjunction)、 感叹词(interjection)
 
 require('colors')
-
-let notFoundCihui = require('./没有查到的词汇总wordreference.json')
-
-let notFoundCihuiF = []
-
-let redirectCihui = []
-
-Object.keys(notFoundCihui).forEach(arr => {
-  if (arr === 'redirect') {
-    redirectCihui = notFoundCihui[arr]
-    return false
-  }
-  notFoundCihuiF.push(...[] || JSON.parse(JSON.stringify(notFoundCihui[arr])))
-})
 
 const startTime = Date.now()
 
@@ -32,10 +20,10 @@ function delSpace (str) {
 }
 
 const c = new Crawler({
-  rateLimit: 10,
+  rateLimit: 3000,
   headers: {
-    'Cookie': '_gid=GA1.2.1269905276.1687082416; xf_csrf=RMZOxR--W8CiQdKd; xf_language_id=10; xf_language_set=1; llang=enzhi; _ga=GA1.1.33121290.1686406213; _ga_WV46ZWEMKW=GS1.1.1687088903.3.1.1687090020.59.0.0',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    'Cookie': 'llang=enzhi; _gid=GA1.2.1408093399.1687243988; _gat_gtag_UA_187118_1=1; _ga=GA1.1.884017165.1687243988; _ga_WV46ZWEMKW=GS1.1.1687243987.1.1.1687243997.50.0.0',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.51',
     // ':Authority': 'www.wordreference.com'
   },
   rateLimit: 300,
@@ -81,15 +69,18 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
     rawDataq.push(fileName.split('.')[0])
   }
 
+  fs.writeFileSync('./all-words.js', JSON.stringify(rawDataq))
+  if (rawDataq) {
+    return false
+  }
+
   cihui.cihui.forEach((cihui, index) => {
 
-    if (notFoundCihuiF.includes(cihui)) {
+    if (all_words.searchedWords.includes(cihui)) {
       console.log('\n')
       console.log('------------------请求开始---------------------', cihui.red, index.toString().green)
-      console.log('该单词位于未查到的词的文件中', cihui)
-      test.not++
-      // console.log(JSON.stringify(test).bgBlue)
-      // return true
+      console.log('该单词已查询过', cihui)
+      return false
     }
 
     let url = encodeURI('https://www.wordreference.com/enzh/' + cihui)
@@ -104,10 +95,11 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
       // console.log(JSON.stringify(test).bgBlue)
       console.log('该单词以完成本地存储，将自动跳过', cihui)
 
-      // return true
+      return true
 
     }
     c.queue([{
+      proxy: 'http://127.0.0.1:7890',
       uri: url,
       // uri: 'http://localhost:3000/wordreference.com/html/get up.html',
       // uri: encodeURI('https://www.wordreference.com/enzh/' + 'against'),
@@ -392,31 +384,32 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
                 if (err) throw err;
                 console.log('当前词汇未查到', cihui);
               });
-              
+
+            } else {
+              fs.writeFile('./wordreference.com/json/' + (cihui || 'default_test_cihui') + '.json', JSON.stringify(bigdata), function (err) {
+                if (err) {
+                  return console.error(err);
+                }
+  
+                let endTimeS = Date.now()
+  
+                const timeM = Math.floor(((endTimeS - startTime) / 1000) / 60) ? Math.floor(((endTimeS - startTime) / 1000) / 60) + ' 分 ' : ''
+                const timeS = Math.floor((endTimeS - startTime) / 1000 % 60) ? Math.floor((endTimeS - startTime) / 1000 % 60) + ' 秒 ' : ''
+                const timeMS = ((endTimeS - startTime) % 1000) + ' 毫秒'
+  
+                const endTime = '已运行' + timeM + timeS + timeMS
+                console.log("数据写入成功！-----词汇数据-----", endTime.red, (count++).toString().green);
+              });
+  
+  
+              !url.includes('localhost') && fs.writeFile('./wordreference.com/html/' + (cihui || 'default_test_cihui') + '.html', res.body, function (err) {
+                if (err) {
+                  return console.error(err);
+                }
+                console.log("数据写入成功！-----html源码", new Date());
+              });
             }
-
-            fs.writeFile('./wordreference.com/json/' + (cihui || 'default_test_cihui') + '.json', JSON.stringify(bigdata), function (err) {
-              if (err) {
-                return console.error(err);
-              }
-
-              let endTimeS = Date.now()
-
-              const timeM = Math.floor(((endTimeS - startTime) / 1000) / 60) ? Math.floor(((endTimeS - startTime) / 1000) / 60) + ' 分 ' : ''
-              const timeS = Math.floor((endTimeS - startTime) / 1000 % 60) ? Math.floor((endTimeS - startTime) / 1000 % 60) + ' 秒 ' : ''
-              const timeMS = ((endTimeS - startTime) % 1000) + ' 毫秒'
-
-              const endTime = '已运行' + timeM + timeS + timeMS
-              console.log("数据写入成功！-----词汇数据-----", endTime.red, (count++).toString().green);
-            });
-
-
-            !url.includes('localhost') && fs.writeFile('./wordreference.com/html/' + (cihui || 'default_test_cihui') + '.html', res.body, function (err) {
-              if (err) {
-                return console.error(err);
-              }
-              console.log("数据写入成功！-----html源码", new Date());
-            });
+            
           }
         }
         done();
