@@ -9,7 +9,8 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-require('./dict-wordreference')
+// require('./dict-wordreference')
+require('./dict-沪江小杜')
 
 // require('./readfile')
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/dictionary.cambridge.org', express.static(path.join(__dirname, 'dictionary.cambridge.org')));
 app.use('/wordreference.com', express.static(path.join(__dirname, 'wordreference.com')));
+app.use('/dict.hjenglish.com', express.static(path.join(__dirname, 'dict.hjenglish.com')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
