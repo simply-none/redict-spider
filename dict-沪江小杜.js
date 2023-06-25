@@ -11,7 +11,7 @@ exists = exists.map(w => w.toLowerCase())
 cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
 
 
-let prefixUrl = 'lw'
+let prefixUrl = 'by'
 let requestUrl = ''
 let dwn = ''
 
@@ -195,7 +195,8 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               (async function () {
                 console.log('正在休眠...'.bgRed);
                 endsleep = false
-                await sleep(1000 * 6);
+                let sleepTime = prefixUrl === 'hj' ? 1000 * 60 * 3 : 1000 * 6
+                await sleep(sleepTime);
                 endsleep = true
                 console.log('休眠结束...'.bgRed);
                 done()
@@ -227,7 +228,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               } else {
                 let $ = res.$;
 
-                if (!$ || $('html').text().includes('抱歉，没有找到你查的单词结果')) {
+                if (!$) {
                   console.log(`是否出错了，爬虫暂停了${new Date()}`.red)
                 }
 
