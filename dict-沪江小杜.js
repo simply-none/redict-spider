@@ -2,19 +2,68 @@ const Crawler = require('crawler');
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是{cihui: []}
-var cihui = require('./勿删-单词文件表wordreferencecom')
+var cihui = require('./单词分类/初中高中四级词汇.json')
 
-var exists = { exist: [] }
+var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
+
+exists = exists.map(w => w.toLowerCase())
+
+cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
 
 
+let prefixUrl = 'lw'
+let requestUrl = ''
+let dwn = ''
+
+switch (prefixUrl) {
+  case 'lw':
+    requestUrl = 'https://www.ldoceonline.com/dictionary/'
+    dwn = 'ldoceonline.com'
+    break
+    case 'hj':
+      requestUrl = 'https://dict.hjenglish.com/w/'
+    dwn = 'hjenglish.com'
+    break
+    case 'by':
+      requestUrl = 'https://www.bing.com/dict/search?q='
+    dwn = 'bing.com'
+    break
+    case 'yd':
+      requestUrl = 'https://youdao.com/w/'
+    dwn = 'youdao.com'
+    break
+    case 'hc':
+      requestUrl = 'http://dict.cn/'
+    dwn = 'dict.cn'
+    break
+    case 'wr':
+      requestUrl = 'https://www.wordreference.com/enzh/'
+    dwn = 'wordreference.com'
+    break
+    case 'jq':
+      requestUrl = 'https://dictionary.cambridge.org/zhs/词典/英语-汉语-简体/'
+    dwn = 'dictionary.cambridge.org'
+    break
+    case 'xdf':
+      requestUrl = 'https://www.koolearn.com/dict/search/index?keywords='
+    dwn = 'koolearn.com'
+    break
+    case 'cls':
+      requestUrl = 'https://www.collinsdictionary.com/zh/dictionary/english-chinese/'
+    dwn = 'collinsdictionary.com'
+    break
+}
+
+if (requestUrl === '') {
+  console.log('暂停...'.bgRed)
+  return false
+}
 
 // 词性：part of speech
 // var POS = 
 // 名词(none)、 动词(verb)、 形容词(adjective)、 副词(adverb)、 冠词(article)、 代词(pronoun)、 数词(numeral)、介词(preposition)、 连词(conjunction)、 感叹词(interjection)
 
 require('colors')
-
-const startTime = Date.now()
 
 function delSpace(str) {
   return str.replace(/^\s+|\s+$/g, "")
@@ -34,9 +83,6 @@ const test = {
   req: 0
 }
 
-
-
-
 const c = new Crawler({
   headers: {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -48,15 +94,13 @@ const c = new Crawler({
     "sec-ch-ua-platform": "\"Windows\"",
     "sec-fetch-dest": "document",
     "sec-fetch-mode": "navigate",
-    "sec-fetch-site": "same-origin",
+    "sec-fetch-site": "none",
     "sec-fetch-user": "?1",
     "upgrade-insecure-requests": "1",
-    "cookie": "_REF=; _SREF_3=; HJ_UID=2d7cb7fa-9b7a-8f21-7238-0b8b5a771b86; TRACKSITEMAP=3%2C20; HJ_CST=0; HJ_SID=z7l5b0-477b-4971-a6b1-4105512e0ed2; HJ_SSID_3=z7l5b0-c60a-4622-afb1-b23f0a65593a; HJ_CSST_3=1; _SREG_3=direct%7C%7Cdirect%7Cdirect; _REG=direct%7C%7Cdirect%7Cdirect; acw_tc=76b20f4416874969797894906ec0b48f710ce91a5bdc71a1f12342d53ed97e",
-    "Referer": "https://dict.hjenglish.com/w/type",
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    "cookie": "preferredDictionaries=\"english-chinese-simplified,english,british-grammar,english-spanish,spanish-english\"; XSRF-TOKEN=a6e96ba3-b73c-4f49-830c-fb9df762aae8; loginPopup=5",
     "Referrer-Policy": "no-referrer-when-downgrade"
   },
-  http2: true,
+  // http2: true,
 
   retries: 1,
   rateLimit: 3000,
@@ -73,7 +117,6 @@ const c = new Crawler({
   }
 });
 
-
 c.on('drain', () => {
   // For example, release a connection to database.
   console.log('\n\n\-----------------------------------'.red)
@@ -81,35 +124,35 @@ c.on('drain', () => {
   console.log('-----------------------------------\n\n'.red)
 });
 
-
 let rawDataq = []
 
-
-
-let dictfile = []
-
-let rawDataDir = './dict.hjenglish.com/html'; // 源文件所在文件夹
+let rawDataDir = './' + dwn + '/html'; // 源文件所在文件夹
 // 2. 读取源文件夹下的所有文件，批量处理
+
+if (!fs.existsSync(rawDataDir)) {
+  fs.mkdirSync(rawDataDir,  {recursive: true})
+}
+
 if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测目录是否存在，返回boolean
   let files = fs.readdirSync(rawDataDir); // fs.readdirSync(path) 方法将返回该路径下所有文件名的数组。
   for (let i = 0; i < files.length; i++) {
-    const fileName = files[i];
+    let fileName = files[i];
 
-    rawDataq.push(fileName.split('.')[0])
+    fileName = decodeURIComponent(fileName)
+
+    rawDataq.push(fileName.split('.html')[0])
   }
 
-  let already = exists.exist.map(word => word.name)
+  rawDataq = rawDataq.map(w => w.toLowerCase())
 
-  let lengthd = cihui.cihui.length - already.length
+  cihui = cihui.filter(w => !rawDataq.includes(w.toLowerCase()))
 
-  rawDataq = rawDataq.map(word => word.replaceAll('%20', ' '))
+  let lengthd = cihui.length
 
-  let testindex = 0
+  console.log(lengthd, 'len')
+  // return true
 
-
-
-
-  cihui.cihui.forEach((cihui, index) => {
+  cihui.forEach((cihui, index) => {
 
     /**
      * 查词url：
@@ -126,11 +169,11 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
      */
 
 
-    let url = encodeURI('https://dict.hjenglish.com/w/' + cihui)
+    let url = encodeURI(requestUrl + cihui)
 
 
     if (rawDataq.find(ci => ci === cihui)) {
-      url = encodeURI('http://localhost:3000/dict.hjenglish.com/' + cihui + '.html')
+      url = encodeURI('http://localhost:3000/' + dwn +  '/html/' + cihui + '.html')
 
       console.log('\n')
       console.log('------------------请求开始---------------------', cihui.red, index.toString().green)
@@ -142,16 +185,6 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
 
     }
 
-    if (already.includes(cihui)) {
-      console.log(`已存在 + ${cihui}`.red)
-      return false
-    }
-
-
-    let randomtime = Math.floor(Math.random() * 3 + 3) * 1000
-
-
-
       ;(function () {
 
         var endsleepC = endsleep
@@ -162,7 +195,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               (async function () {
                 console.log('正在休眠...'.bgRed);
                 endsleep = false
-                await sleep(1000 * 60 * 3);
+                await sleep(1000 * 6);
                 endsleep = true
                 console.log('休眠结束...'.bgRed);
                 done()
@@ -171,15 +204,13 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               done()
             }
           },
-          rateLimit: randomtime,
-          proxy: 'http://127.0.0.1:7890',
+          // proxy: 'http://127.0.0.1:7890',
           uri: url,
           // uri: 'http://localhost:3000/dict.hjenglish.com/html/get up.html',
-          // uri: encodeURI('https://www.dict.hjenglish.com/enzh/' + 'against'),
+          // uri: encodeURIComponent('https://www.dict.hjenglish.com/enzh/' + 'against'),
           jQuery: true,
           callback: (error, res, done) => {
             test.req++
-            // console.log(JSON.stringify(test).bgBlue)
             console.log('\n')
             console.log('------------------请求开始---------------------'.bgGreen, cihui.red, index.toString().green, lengthd.toString().yellow)
             // console.log(res.request.uri.href, '当前请求的url')
@@ -187,37 +218,25 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               console.log(error);
             } else {
 
-              // console.log(Object.keys(res.request), '测试', res.request.response)
+              if (prefixUrl === 'xdf') {
+                const dictkk = ({
+                  name: cihui,
+                  url: res.request.uri.href
+                })
+                fs.appendFileSync(`新东方dicturl.txt`, JSON.stringify(dictkk) + ',')
+              } else {
+                let $ = res.$;
 
-              const dictkk = ({
-                name: cihui,
-                url: res.request.uri.href
-              })
-
-              let $ = res.$;
-
-              if ($('html').text().includes('抱歉，没有找到你查的单词结果')) {
-                console.log(`是否出错了，爬虫暂停了${new Date()}`.red)
-              }
-
-              fs.writeFileSync('./dict.hjenglish.com/html/' + cihui + '.html', $('html').html() || '', (err) => {
-                if (err) {
-                  return console.error(err);
+                if (!$ || $('html').text().includes('抱歉，没有找到你查的单词结果')) {
+                  console.log(`是否出错了，爬虫暂停了${new Date()}`.red)
                 }
+
+                fs.writeFileSync(('./' + dwn + '/html/' + encodeURIComponent(cihui) + '.html'), res.body || '')
+
                 count++
 
-
-                console.log("数据写入成功！-----html源码", cihui.red, index.toString().yellow);
-              })
-
-              count++
-
-              console.log("数据写入成功！-----html源码", cihui.red, index.toString().yellow);
-
-
-              
-
-
+                console.log("数据写入成功！-----html源码", cihui.red, count.toString().yellow, lengthd.toString().bgYellow);
+              }
             }
             done();
           }
