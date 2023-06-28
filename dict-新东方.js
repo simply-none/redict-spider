@@ -3,7 +3,9 @@ var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是{cihui: []}
 
-var cihui = require('./新东方测试 copy')
+var cihui = require('./新东方endurl.json')
+
+var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
 
 
 // 词性：part of speech
@@ -86,12 +88,16 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
   }
 
   rawDataq = rawDataq.map(w => decodeURIComponent(w).toLowerCase())
+  exists = exists.map(w => decodeURIComponent(w).toLowerCase())
 
-  cihui.cihui = cihui.cihui.filter(word => !rawDataq.includes(word.name.toLowerCase()))
+  cihui = cihui.filter(word => !rawDataq.includes(word.name.toLowerCase()))
+  cihui = cihui.filter(word => !exists.includes(word.name.toLowerCase()))
 
-  let cihui_len = cihui.cihui.length
 
-  cihui.cihui.forEach((cihui, index) => {
+
+  let cihui_len = cihui.length
+
+  cihui.forEach((cihui, index) => {
 
     if (rawDataq.includes(cihui.name)) {
       console.log('当前词汇一缓存'.green)
@@ -112,7 +118,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
           (async function () {
             console.log('正在休眠...'.bgRed);
             endsleep = false
-            await sleep(1000 * 10 * 1);
+            await sleep(1000 * 5 * 1);
             endsleep = true
             console.log('休眠结束...'.bgRed);
             done()

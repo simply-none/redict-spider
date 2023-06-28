@@ -2,7 +2,14 @@ const Crawler = require('crawler');
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是{cihui: []}
-var cihui = require('./单词分类/初中高中四级词汇.json')
+var cihui = require('./单词分类/gre词汇(除初考外).json')
+
+var cihui2 = require('./单词分类/初中高中四级词汇.json')
+var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
+
+cihui = cihui.concat(cihui2, cihui3)
+
+cihui = [...new Set(cihui)]
 
 var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
 
@@ -11,7 +18,7 @@ exists = exists.map(w => w.toLowerCase())
 cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
 
 
-let prefixUrl = 'by'
+let prefixUrl = 'lw'
 let requestUrl = ''
 let dwn = ''
 
@@ -59,6 +66,11 @@ if (requestUrl === '') {
   return false
 }
 
+// if (Date.now()) {
+//   console.log('切换url时，请改请求头...'.bgRed)
+//   return false
+// }
+
 // 词性：part of speech
 // var POS = 
 // 名词(none)、 动词(verb)、 形容词(adjective)、 副词(adverb)、 冠词(article)、 代词(pronoun)、 数词(numeral)、介词(preposition)、 连词(conjunction)、 感叹词(interjection)
@@ -85,20 +97,8 @@ const test = {
 
 const c = new Crawler({
   headers: {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
-    "cache-control": "no-cache",
-    "pragma": "no-cache",
-    "sec-ch-ua": "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"",
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": "\"Windows\"",
-    "sec-fetch-dest": "document",
-    "sec-fetch-mode": "navigate",
-    "sec-fetch-site": "none",
-    "sec-fetch-user": "?1",
-    "upgrade-insecure-requests": "1",
-    "cookie": "preferredDictionaries=\"english-chinese-simplified,english,british-grammar,english-spanish,spanish-english\"; XSRF-TOKEN=a6e96ba3-b73c-4f49-830c-fb9df762aae8; loginPopup=5",
-    "Referrer-Policy": "no-referrer-when-downgrade"
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    "cookie": "iawpvccs=1; iawsc1m=1; iawpvc=1; iawpvtc1m=1; _pbjs_userid_consent_data=3524755945110770; _sharedID=7fa963c7-55fc-4dde-8605-9b5a9692feb2; OptanonConsent=isGpcEnabled=0&datestamp=Wed+Jun+28+2023+11%3A37%3A43+GMT%2B0800+(%E4%B8%AD%E5%9B%BD%E6%A0%87%E5%87%86%E6%97%B6%E9%97%B4)&version=202303.2.0&browserGpcFlag=0&isIABGlobal=false&hosts=&landingPath=https%3A%2F%2Fwww.ldoceonline.com%2Fdictionary%2Ftype&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1%2CC0004%3A0; _ga=GA1.3.662402859.1687923464; _gid=GA1.3.1427758519.1687923464; _gat=1; _ga_XTSM3GZLX5=GS1.1.1687923464.1.0.1687923464.0.0.0; _ga=GA1.1.662402859.1687923464; __qca=P0-203542745-1687923462402; _lr_retry_request=true; _lr_env_src_ats=false; pbjs-unifiedid=%7B%22TDID%22%3A%220b03f864-ad8e-42e5-a513-645318ca5ddd%22%2C%22TDID_LOOKUP%22%3A%22TRUE%22%2C%22TDID_CREATED_AT%22%3A%222023-05-28T03%3A37%3A47%22%7D; cto_bundle=uvqUEV9NcmFIUUlTUUl4b2JBbkx2aWppZSUyRmRZRXhRSHJHcm1jSzc2NSUyRmJJdkFLYm42dVh4enRmb2VBSUt4bGNsbHJxVEl1WG1PJTJCQU9oQXAxSnFPJTJGRlhITDQ4QXgyeVRtUDI0SUpUMHptWiUyRnBVaVhybkZsTTlGRVpXZm0lMkJGbGNoVjB3MEhGRSUyQkZpVGZLampzY05RdURQdGdMZyUzRCUzRA; cto_bidid=UT7eoV9tRjM0MEZSanpvN2hvWDFNSnpBcHVZM2I3aDc2dzNvYTZvbHlOa2JmR0xvT3JiWWNjSnYzOWc2MUN1RGhaYUJlN3lzRkRDcFREMTRGRm9tR3ZiSkZNS3kzR2xvNEtLV2xTeDdoR08xVU1OcFZnRFZFakhhMVhwSU1Vb090UGolMkJJ",
   },
   // http2: true,
 
@@ -205,7 +205,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               done()
             }
           },
-          // proxy: 'http://127.0.0.1:7890',
+          proxy: 'http://127.0.0.1:7890',
           uri: url,
           // uri: 'http://localhost:3000/dict.hjenglish.com/html/get up.html',
           // uri: encodeURIComponent('https://www.dict.hjenglish.com/enzh/' + 'against'),
