@@ -2,7 +2,16 @@ const Crawler = require('crawler');
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是{cihui: []}
-var cihui = require('./单词分类/初中高中四级词汇.json')
+var cihui = require('./单词分类/gre词汇(除初考外).json')
+
+var cihui2 = require('./单词分类/初中高中四级词汇.json')
+var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
+
+cihui = cihui.concat(cihui2, cihui3)
+
+cihui = [...new Set(cihui)]
+
+var xindongfangcihui = require('./新东方测试.json')
 
 var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
 
@@ -11,9 +20,17 @@ exists = exists.map(w => w.toLowerCase())
 cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
 
 
-let prefixUrl = 'by'
+let prefixUrl = 'hc'
 let requestUrl = ''
 let dwn = ''
+
+if (prefixUrl === 'xdf') {
+  xindongfangcihui = xindongfangcihui.map(ci => ci.name.toLowerCase())
+
+  console.log(xindongfangcihui, xindongfangcihui.length)
+
+  cihui = cihui.filter(w => !xindongfangcihui.includes(w.toLowerCase()))
+}
 
 switch (prefixUrl) {
   case 'lw':
@@ -59,6 +76,11 @@ if (requestUrl === '') {
   return false
 }
 
+// if (Date.now()) {
+//   console.log('切换url时，请改请求头...'.bgRed)
+//   return false
+// }
+
 // 词性：part of speech
 // var POS = 
 // 名词(none)、 动词(verb)、 形容词(adjective)、 副词(adverb)、 冠词(article)、 代词(pronoun)、 数词(numeral)、介词(preposition)、 连词(conjunction)、 感叹词(interjection)
@@ -85,19 +107,8 @@ const test = {
 
 const c = new Crawler({
   headers: {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
-    "cache-control": "no-cache",
-    "pragma": "no-cache",
-    "sec-ch-ua": "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"",
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": "\"Windows\"",
-    "sec-fetch-dest": "document",
-    "sec-fetch-mode": "navigate",
-    "sec-fetch-site": "none",
-    "sec-fetch-user": "?1",
-    "upgrade-insecure-requests": "1",
-    "cookie": "preferredDictionaries=\"english-chinese-simplified,english,british-grammar,english-spanish,spanish-english\"; XSRF-TOKEN=a6e96ba3-b73c-4f49-830c-fb9df762aae8; loginPopup=5",
+    "cookie": "llang=enzhi; _pbjs_userid_consent_data=3524755945110770; _sharedid=aa3c30d4-efe5-4b3b-9d38-a3051d7b24cf; __gads=ID=1287f16a8d27799c:T=1687228433:RT=1687228433:S=ALNI_Mah1D8camy0Qc-WAojJf1TVXKSn7Q; __gpi=UID=00000c14cf6e84bc:T=1687228433:RT=1687228433:S=ALNI_Ma9-wzZgTj-b3XN0Zi3WrcOQP-pHQ; cto_bundle=yHoMr18lMkZiOFNSc0dhN21TWWpIMkZwT0VTJTJCbnZuQW9uVmo4V1pNbkZOJTJGdElYa3JQYSUyRkNlYjN3R0RtUHFVSGdJdzltUE82Y2p0ZnhoRkR6M3ZHa1BLR0l4MlRXMUg2cDB6RTVENXpHQzhvSUlWMWMxMGM4bklzb2pObEFwRElYQUpxMUo2RSUyQjRpVVl0dHZLaVB3ckFyRGlIWGxRJTNEJTNE; cto_bidid=mn1tg18xNmhObjZCc0dHUkZMczZncDBLTHlkYkVuYnFrWU5oTVpGb1ZxWVRZSWdEeDFIU05JUnNsN0pQWVIwYXp1MWgwd1Zqd3pMWkhKejBCa0FVaEVHU1lWJTJCSVZSeDBFUUslMkZFdDBUNWJtVjZ0YmQ3QTBsM05hQUtVSkh5WGx1a1pZTWo; FCNEC=%5B%5B%22AKsRol9d_qXOQ4gLqp5UDiUb-PLRfeg7PEdIfAa7SBG5UzJxNnybFMoCQFoDYFj0-V2qIjETgSVChL4KsljWP8vtoMADv4zviy8l0GcwA6jCQ-t5Ml6myLJEs8lNx5rluOFGPqC-Mr4Vdmet6j3WEdxQi9KMQ0a7OQ%3D%3D%22%5D%2Cnull%2C%5B%5D%5D; _ga=GA1.1.326739331.1687135003; _ga_WV46ZWEMKW=GS1.1.1687758932.9.0.1687758932.60.0.0",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     "Referrer-Policy": "no-referrer-when-downgrade"
   },
   // http2: true,
