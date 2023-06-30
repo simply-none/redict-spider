@@ -20,7 +20,7 @@ exists = exists.map(w => w.toLowerCase())
 cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
 
 
-let prefixUrl = 'hc'
+let prefixUrl = 'lw'
 let requestUrl = ''
 let dwn = ''
 
@@ -216,7 +216,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
               done()
             }
           },
-          // proxy: 'http://127.0.0.1:7890',
+          proxy: 'http://127.0.0.1:7890',
           uri: url,
           // uri: 'http://localhost:3000/dict.hjenglish.com/html/get up.html',
           // uri: encodeURIComponent('https://www.dict.hjenglish.com/enzh/' + 'against'),

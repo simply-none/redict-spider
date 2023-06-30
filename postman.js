@@ -34,11 +34,78 @@
     第五步：开启本地服务，使用expressjs，端口号需和上面保持一致（5643），下面是用例
 
  */
+    let fs = require('fs')
+let jsontocsc = require('json-2-csv')
+
+let json2csvCallback = function (err, csv) {
+    console.log('测试')
+    if (err) throw err;
+    console.log('测试')
+
+    // 对于需要爬取postman爬取数据的网站，转成csv
+    fs.writeFile('./科林斯.csv', csv, 'utf8', function(err) {
+    if (err) {
+        console.log('Some error occured - file either not saved or corrupted file saved.');
+    } else {
+        console.log('It\'s saved!');
+    }
+    });
+};
+
+var cihui = require('./单词分类/gre词汇(除初考外).json')
+var cihui2 = require('./单词分类/初中高中四级词汇.json')
+var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
+
+let all_word_in_file = cihui.concat(cihui2, cihui3)
+
+all_word_in_file = [...new Set(all_word_in_file)]
+
+var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
+
+exists = exists.map(w => w.toLowerCase())
+
+let rawDataDir = './' + 'collinsdictionary.com' + '/html'; // 源文件所在文件夹
+// 2. 读取源文件夹下的所有文件，批量处理
+let rawDataq = []
+if (!fs.existsSync(rawDataDir)) {
+  fs.mkdirSync(rawDataDir,  {recursive: true})
+}
+
+if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测目录是否存在，返回boolean
+  let files = fs.readdirSync(rawDataDir); // fs.readdirSync(path) 方法将返回该路径下所有文件名的数组。
+  for (let i = 0; i < files.length; i++) {
+    let fileName = files[i];
+
+    fileName = decodeURIComponent(fileName)
+
+    rawDataq.push(fileName.split('.html')[0])
+  }
+
+  rawDataq = rawDataq.map(w => w.toLowerCase())
+
+  all_word_in_file = all_word_in_file.filter(w => !rawDataq.includes(w.toLowerCase()))
+}
+
+all_word_in_file = all_word_in_file.filter(w => !exists.includes(w.toLowerCase()))
+
+all_word_in_file = all_word_in_file.map(word => {
+    return {
+      query: word
+    }
+  })
+
+console.log(all_word_in_file.length)
+
+jsontocsc.json2csv(all_word_in_file, json2csvCallback, {
+    // prependHeader: false      // removes the generated header of "value1,value2,value3,value4" (in case you don't want it)
+  }).then(res => {
+    json2csvCallback('', res)
+  })
+
 
 require('colors')
-const express = require('express'),
+var express = require('express'),
     app = express(),
-    fs = require('fs'),
     shell = require('shelljs'),
 
     // Modify the folder path in which responses need to be stored
@@ -63,11 +130,11 @@ app.post('/write', (req, res) => {
     const { data,fileName } = req.body
     // console.log(req)
     // console.log(res, res)
-    const fileNamePath = fileName.url.path[1]
+    const fileNamePath = fileName.url.path[3]
     count++
     console.log(fileNamePath, count.toString().red)
 
-    fs.writeFileSync('./dict.hjenglish.com/html/'+fileNamePath+'.html', data, 'utf8');
+    fs.writeFileSync('./collinsdictionary.com/html/'+fileNamePath+'.html', data, 'utf8');
     res.send('Success');
 });
 
