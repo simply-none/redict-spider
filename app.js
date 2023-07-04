@@ -10,7 +10,8 @@ var usersRouter = require('./routes/users');
 var app = express();
 
 // require('./dict-wordreference')
-require('./dict-沪江小杜')
+// require('./dict-沪江小杜')
+require('./dict-沪江小杜 copy')
 
 // require('./readfile')
 

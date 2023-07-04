@@ -7,18 +7,20 @@ var cihui = require('./单词分类/gre词汇(除初考外).json')
 var cihui2 = require('./单词分类/初中高中四级词汇.json')
 var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
 
-cihui = cihui.concat(cihui2, cihui3)
 
-cihui = [...new Set(cihui)]
 
 var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
 
-exists = exists.map(w => w.toLowerCase())
+cihui = cihui.concat(cihui2, cihui3, exists)
 
-cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
+cihui = [...new Set(cihui)]
+
+// exists = exists.map(w => w.toLowerCase())
+
+// cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
 
 
-let prefixUrl = 'lw'
+let prefixUrl = 'voc'
 let requestUrl = ''
 let dwn = ''
 
@@ -59,6 +61,14 @@ switch (prefixUrl) {
       requestUrl = 'https://www.collinsdictionary.com/zh/dictionary/english-chinese/'
     dwn = 'collinsdictionary.com'
     break
+    case 'mzl':
+      requestUrl = 'https://www.merriam-webster.com/dictionary/'
+    dwn = 'merriam-webster.com'
+    break
+    case 'voc':
+      requestUrl = 'https://www.vocabulary.com/dictionary/'
+    dwn = 'vocabulary.com'
+    break
 }
 
 if (requestUrl === '') {
@@ -98,7 +108,7 @@ const test = {
 const c = new Crawler({
   headers: {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-    "cookie": "iawpvccs=1; iawsc1m=1; iawpvc=1; iawpvtc1m=1; _pbjs_userid_consent_data=3524755945110770; _sharedID=7fa963c7-55fc-4dde-8605-9b5a9692feb2; OptanonConsent=isGpcEnabled=0&datestamp=Wed+Jun+28+2023+11%3A37%3A43+GMT%2B0800+(%E4%B8%AD%E5%9B%BD%E6%A0%87%E5%87%86%E6%97%B6%E9%97%B4)&version=202303.2.0&browserGpcFlag=0&isIABGlobal=false&hosts=&landingPath=https%3A%2F%2Fwww.ldoceonline.com%2Fdictionary%2Ftype&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1%2CC0004%3A0; _ga=GA1.3.662402859.1687923464; _gid=GA1.3.1427758519.1687923464; _gat=1; _ga_XTSM3GZLX5=GS1.1.1687923464.1.0.1687923464.0.0.0; _ga=GA1.1.662402859.1687923464; __qca=P0-203542745-1687923462402; _lr_retry_request=true; _lr_env_src_ats=false; pbjs-unifiedid=%7B%22TDID%22%3A%220b03f864-ad8e-42e5-a513-645318ca5ddd%22%2C%22TDID_LOOKUP%22%3A%22TRUE%22%2C%22TDID_CREATED_AT%22%3A%222023-05-28T03%3A37%3A47%22%7D; cto_bundle=uvqUEV9NcmFIUUlTUUl4b2JBbkx2aWppZSUyRmRZRXhRSHJHcm1jSzc2NSUyRmJJdkFLYm42dVh4enRmb2VBSUt4bGNsbHJxVEl1WG1PJTJCQU9oQXAxSnFPJTJGRlhITDQ4QXgyeVRtUDI0SUpUMHptWiUyRnBVaVhybkZsTTlGRVpXZm0lMkJGbGNoVjB3MEhGRSUyQkZpVGZLampzY05RdURQdGdMZyUzRCUzRA; cto_bidid=UT7eoV9tRjM0MEZSanpvN2hvWDFNSnpBcHVZM2I3aDc2dzNvYTZvbHlOa2JmR0xvT3JiWWNjSnYzOWc2MUN1RGhaYUJlN3lzRkRDcFREMTRGRm9tR3ZiSkZNS3kzR2xvNEtLV2xTeDdoR08xVU1OcFZnRFZFakhhMVhwSU1Vb090UGolMkJJ",
+    // "cookie": "tz=Asia/Shanghai; _eu=0; _gid=GA1.2.1362504168.1688444485; _gat=1; __cf_bm=EkR_ggzgL4sntaIXxRGaLGG_lan9VCj7L.FIS9VlFFg-1688444487-0-ASwUhpIgw6mRGC7HlbS7hRy8qR0BkPHDkX7jLxfzriN2Lj742K3OUXDZLuTzGkI9gA==; JSESSIONID=9CC41ADBA1C92B3A88AF6E65FAB77D6E; _ga=GA1.1.1721736142.1688444485; AWSALB=Y4uv2q5I/KO+V9hZpFGU7ohrp/5LdLSfh2ETZIelcdqirV0Bv7DgSdKsN+7XfH5mftGEjMCB0KiVLFUHCxVkDUPJdSfz6znMkr0yT8G/zj0TDH/+CTjjSBc3dlW9; AWSALBCORS=Y4uv2q5I/KO+V9hZpFGU7ohrp/5LdLSfh2ETZIelcdqirV0Bv7DgSdKsN+7XfH5mftGEjMCB0KiVLFUHCxVkDUPJdSfz6znMkr0yT8G/zj0TDH/+CTjjSBc3dlW9; _ga_B7PDCY8BWM=GS1.1.1688444485.1.1.1688444505.0.0.0",
   },
   // http2: true,
 
@@ -191,11 +201,11 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
         c.queue([{
           preRequest: (options, done) => {
             var coutC = count
-            if (coutC && coutC % 35 === 0) {
+            if (coutC && coutC % 35 === 0 || coutC === 3000) {
               (async function () {
                 console.log('正在休眠...'.bgRed);
                 endsleep = false
-                let sleepTime = prefixUrl === 'hj' ? 1000 * 60 * 3 : 1000 * 6
+                let sleepTime = prefixUrl === 'hj' ? 1000 * 60 * 3 : 1000 * 3
                 await sleep(sleepTime);
                 endsleep = true
                 console.log('休眠结束...'.bgRed);

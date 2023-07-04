@@ -10,6 +10,7 @@
   "dependencies": {
     "colors": "^1.4.0",
     "cookie-parser": "~1.4.4",
+    "crawlee": "^3.4.0",
     "crawler": "^1.4.0",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -17,6 +18,7 @@
     "jade": "~1.11.0",
     "moment": "^2.29.4",
     "morgan": "~1.9.1",
+    "playwright": "^1.35.1",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
