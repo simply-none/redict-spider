@@ -1,6 +1,8 @@
 // Add import of CheerioCrawler
 let crawlee = require("crawlee");
 let {
+  log,
+  LoggerJson,
   RequestQueue,
   RequestList,
   CheerioCrawler,
@@ -21,7 +23,7 @@ cihui = cihui.concat(cihui2, cihui3, exists);
 
 cihui = [...new Set(cihui)];
 
-cihui = cihui.map((ci) => ci.toLowerCase());
+// cihui = cihui.map((ci) => ci.toLowerCase());
 
 console.log(cihui.length);
 
@@ -103,9 +105,6 @@ for (let i = 0; i < files.length; i++) {
 rawDataq = rawDataq.map((w) => w.toLowerCase());
 
 cihui = cihui.filter((w) => {
-  if (rawDataq.includes(w.toLowerCase())) {
-    console.log('输出')
-  }
   return !rawDataq.includes(w.toLowerCase())
 });
 
@@ -123,6 +122,11 @@ async function init() {
     proxyUrls: ["http://127.0.0.1:7890"],
   });
 
+  log.setOptions({
+    level: log.LEVELS.ERROR,
+    logger: new LoggerJson(),
+  });
+
   // Open the request list with the initial sources array
   const requestList = await RequestList.open("my-list", sources);
   const requestQueue = await RequestQueue.open();
@@ -130,9 +134,10 @@ async function init() {
   // Create the crawler and add the queue with our URL
   // and a request handler to process the page.
   const crawler = new PlaywrightCrawler({
-    proxyConfiguration,
-    maxConcurrency: 3,
-    maxRequestsPerMinute: 30,
+    // proxyConfiguration,
+    maxRequestsPerCrawl: 3000,
+    maxConcurrency: 1,
+    maxRequestsPerMinute: 20,
     requestList,
     requestQueue,
     // The `$` argument is the Cheerio object
@@ -146,7 +151,7 @@ async function init() {
 
       name = name[1] || 'a_error_error'
 
-      console.log(`start ${name}`.bgRed);
+      console.log(`start ${name}`.red);
 
       fs.writeFileSync(
         "./" + dwn + "/html/" + encodeURIComponent(name) + ".html",

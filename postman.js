@@ -38,12 +38,12 @@
 let jsontocsc = require('json-2-csv')
 
 let json2csvCallback = function (err, csv) {
-    console.log('测试')
+    console.log('测试', csv.length)
     if (err) throw err;
     console.log('测试')
 
     // 对于需要爬取postman爬取数据的网站，转成csv
-    fs.writeFile('./科林斯.csv', csv, 'utf8', function(err) {
+    fs.writeFile('./voc.csv', csv, 'utf8', function(err) {
     if (err) {
         console.log('Some error occured - file either not saved or corrupted file saved.');
     } else {
@@ -55,16 +55,17 @@ let json2csvCallback = function (err, csv) {
 var cihui = require('./单词分类/gre词汇(除初考外).json')
 var cihui2 = require('./单词分类/初中高中四级词汇.json')
 var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
+var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
 
-let all_word_in_file = cihui.concat(cihui2, cihui3)
+
+let all_word_in_file = cihui.concat(cihui2, cihui3, exists)
 
 all_word_in_file = [...new Set(all_word_in_file)]
 
-var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
 
-exists = exists.map(w => w.toLowerCase())
+// exists = exists.map(w => w.toLowerCase())
 
-let rawDataDir = './' + 'collinsdictionary.com' + '/html'; // 源文件所在文件夹
+let rawDataDir = './' + 'vocabulary.com' + '/html'; // 源文件所在文件夹
 // 2. 读取源文件夹下的所有文件，批量处理
 let rawDataq = []
 if (!fs.existsSync(rawDataDir)) {
@@ -86,7 +87,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
   all_word_in_file = all_word_in_file.filter(w => !rawDataq.includes(w.toLowerCase()))
 }
 
-all_word_in_file = all_word_in_file.filter(w => !exists.includes(w.toLowerCase()))
+// all_word_in_file = all_word_in_file.filter(w => !exists.includes(w.toLowerCase()))
 
 all_word_in_file = all_word_in_file.map(word => {
     return {
@@ -94,7 +95,7 @@ all_word_in_file = all_word_in_file.map(word => {
     }
   })
 
-console.log(all_word_in_file.length)
+console.log(all_word_in_file.length, 'end')
 
 jsontocsc.json2csv(all_word_in_file, json2csvCallback, {
     // prependHeader: false      // removes the generated header of "value1,value2,value3,value4" (in case you don't want it)
@@ -129,12 +130,12 @@ let count = 0
 app.post('/write', (req, res) => {
     const { data,fileName } = req.body
     // console.log(req)
-    // console.log(res, res)
-    const fileNamePath = fileName.url.path[3]
+    console.log(fileName.url)
+    const fileNamePath = fileName.url.path[1]
     count++
     console.log(fileNamePath, count.toString().red)
 
-    fs.writeFileSync('./collinsdictionary.com/html/'+fileNamePath+'.html', data, 'utf8');
+    fs.writeFileSync('./vocabulary.com/html/'+fileNamePath+'.html', data, 'utf8');
     res.send('Success');
 });
 

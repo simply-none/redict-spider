@@ -12,7 +12,7 @@ newData/
 storage
 test-test
 提取*
-
+*.csv
 download
 vocabulary.com
 node_modules

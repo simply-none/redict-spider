@@ -11,7 +11,7 @@ var app = express();
 
 // require('./dict-wordreference')
 // require('./dict-沪江小杜')
-require('./dict-沪江小杜 copy')
+require('./dict-js-enabled')
 
 // require('./readfile')
 
