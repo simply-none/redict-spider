@@ -9,6 +9,8 @@ var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
 
 
 
+var xindongfangcihui = require('./新东方测试.json')
+
 var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
 
 cihui = cihui.concat(cihui2, cihui3, exists)
@@ -23,6 +25,14 @@ cihui = [...new Set(cihui)]
 let prefixUrl = 'voc'
 let requestUrl = ''
 let dwn = ''
+
+if (prefixUrl === 'xdf') {
+  xindongfangcihui = xindongfangcihui.map(ci => ci.name.toLowerCase())
+
+  console.log(xindongfangcihui, xindongfangcihui.length)
+
+  cihui = cihui.filter(w => !xindongfangcihui.includes(w.toLowerCase()))
+}
 
 switch (prefixUrl) {
   case 'lw':
@@ -107,8 +117,9 @@ const test = {
 
 const c = new Crawler({
   headers: {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-    // "cookie": "tz=Asia/Shanghai; _eu=0; _gid=GA1.2.1362504168.1688444485; _gat=1; __cf_bm=EkR_ggzgL4sntaIXxRGaLGG_lan9VCj7L.FIS9VlFFg-1688444487-0-ASwUhpIgw6mRGC7HlbS7hRy8qR0BkPHDkX7jLxfzriN2Lj742K3OUXDZLuTzGkI9gA==; JSESSIONID=9CC41ADBA1C92B3A88AF6E65FAB77D6E; _ga=GA1.1.1721736142.1688444485; AWSALB=Y4uv2q5I/KO+V9hZpFGU7ohrp/5LdLSfh2ETZIelcdqirV0Bv7DgSdKsN+7XfH5mftGEjMCB0KiVLFUHCxVkDUPJdSfz6znMkr0yT8G/zj0TDH/+CTjjSBc3dlW9; AWSALBCORS=Y4uv2q5I/KO+V9hZpFGU7ohrp/5LdLSfh2ETZIelcdqirV0Bv7DgSdKsN+7XfH5mftGEjMCB0KiVLFUHCxVkDUPJdSfz6znMkr0yT8G/zj0TDH/+CTjjSBc3dlW9; _ga_B7PDCY8BWM=GS1.1.1688444485.1.1.1688444505.0.0.0",
+    "cookie": "llang=enzhi; _pbjs_userid_consent_data=3524755945110770; _sharedid=aa3c30d4-efe5-4b3b-9d38-a3051d7b24cf; __gads=ID=1287f16a8d27799c:T=1687228433:RT=1687228433:S=ALNI_Mah1D8camy0Qc-WAojJf1TVXKSn7Q; __gpi=UID=00000c14cf6e84bc:T=1687228433:RT=1687228433:S=ALNI_Ma9-wzZgTj-b3XN0Zi3WrcOQP-pHQ; cto_bundle=yHoMr18lMkZiOFNSc0dhN21TWWpIMkZwT0VTJTJCbnZuQW9uVmo4V1pNbkZOJTJGdElYa3JQYSUyRkNlYjN3R0RtUHFVSGdJdzltUE82Y2p0ZnhoRkR6M3ZHa1BLR0l4MlRXMUg2cDB6RTVENXpHQzhvSUlWMWMxMGM4bklzb2pObEFwRElYQUpxMUo2RSUyQjRpVVl0dHZLaVB3ckFyRGlIWGxRJTNEJTNE; cto_bidid=mn1tg18xNmhObjZCc0dHUkZMczZncDBLTHlkYkVuYnFrWU5oTVpGb1ZxWVRZSWdEeDFIU05JUnNsN0pQWVIwYXp1MWgwd1Zqd3pMWkhKejBCa0FVaEVHU1lWJTJCSVZSeDBFUUslMkZFdDBUNWJtVjZ0YmQ3QTBsM05hQUtVSkh5WGx1a1pZTWo; FCNEC=%5B%5B%22AKsRol9d_qXOQ4gLqp5UDiUb-PLRfeg7PEdIfAa7SBG5UzJxNnybFMoCQFoDYFj0-V2qIjETgSVChL4KsljWP8vtoMADv4zviy8l0GcwA6jCQ-t5Ml6myLJEs8lNx5rluOFGPqC-Mr4Vdmet6j3WEdxQi9KMQ0a7OQ%3D%3D%22%5D%2Cnull%2C%5B%5D%5D; _ga=GA1.1.326739331.1687135003; _ga_WV46ZWEMKW=GS1.1.1687758932.9.0.1687758932.60.0.0",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    "Referrer-Policy": "no-referrer-when-downgrade"
   },
   // http2: true,
 
