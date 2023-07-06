@@ -12,20 +12,15 @@ let {
 let fs = require("fs");
 require("colors");
 
-var cihui = require("./单词分类/gre词汇(除初考外).json");
+var cihui = require('./单词分类/vuejs-doc-words.json')
 
-var cihui2 = require("./单词分类/初中高中四级词汇.json");
-var cihui3 = require("./单词分类/考研六级托福SAT词汇.json");
+var exist = require('./allwords')
 
-var exists = require("./单词分类/已下载但未过滤的词汇汇总.json");
+cihui = cihui.concat(exist)
 
-cihui = cihui.concat(cihui2, cihui3, exists);
+cihui = [...new Set(cihui)]
 
-cihui = [...new Set(cihui)];
-
-// cihui = cihui.map((ci) => ci.toLowerCase());
-
-console.log(cihui.length);
+console.log(cihui.length)
 
 let prefixUrl = "voc";
 let requestUrl = "";
@@ -111,6 +106,8 @@ cihui = cihui.filter((w) => {
 let lengthd = cihui.length;
 
 console.log(lengthd, "len");
+
+// return false
 
 cihui = cihui.map((ci) => requestUrl + ci);
 

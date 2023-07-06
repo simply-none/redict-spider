@@ -2,37 +2,21 @@ const Crawler = require('crawler');
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是{cihui: []}
-var cihui = require('./单词分类/gre词汇(除初考外).json')
+var cihui = require('./单词分类/vuejs-doc-words.json')
 
-var cihui2 = require('./单词分类/初中高中四级词汇.json')
-var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
+var exist = require('./allwords')
+exist = exist.map(w => w.toLowerCase())
 
-
-
-var xindongfangcihui = require('./新东方测试.json')
-
-var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
-
-cihui = cihui.concat(cihui2, cihui3, exists)
+cihui = cihui.filter(w => !exist.includes(w.toLowerCase()))
 
 cihui = [...new Set(cihui)]
 
-// exists = exists.map(w => w.toLowerCase())
-
-// cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
-
+console.log(cihui.length)
+return false
 
 let prefixUrl = 'voc'
 let requestUrl = ''
 let dwn = ''
-
-if (prefixUrl === 'xdf') {
-  xindongfangcihui = xindongfangcihui.map(ci => ci.name.toLowerCase())
-
-  console.log(xindongfangcihui, xindongfangcihui.length)
-
-  cihui = cihui.filter(w => !xindongfangcihui.includes(w.toLowerCase()))
-}
 
 switch (prefixUrl) {
   case 'lw':
@@ -63,10 +47,6 @@ switch (prefixUrl) {
       requestUrl = 'https://dictionary.cambridge.org/zhs/词典/英语-汉语-简体/'
     dwn = 'dictionary.cambridge.org'
     break
-    case 'xdf':
-      requestUrl = 'https://www.koolearn.com/dict/search/index?keywords='
-    dwn = 'koolearn.com'
-    break
     case 'cls':
       requestUrl = 'https://www.collinsdictionary.com/zh/dictionary/english-chinese/'
     dwn = 'collinsdictionary.com'
@@ -85,15 +65,6 @@ if (requestUrl === '') {
   console.log('暂停...'.bgRed)
   return false
 }
-
-// if (Date.now()) {
-//   console.log('切换url时，请改请求头...'.bgRed)
-//   return false
-// }
-
-// 词性：part of speech
-// var POS = 
-// 名词(none)、 动词(verb)、 形容词(adjective)、 副词(adverb)、 冠词(article)、 代词(pronoun)、 数词(numeral)、介词(preposition)、 连词(conjunction)、 感叹词(interjection)
 
 require('colors')
 
@@ -132,14 +103,12 @@ const c = new Crawler({
       console.log(error);
     } else {
       const $ = res.$;
-      // console.log($('title').text());
     }
     done();
   }
 });
 
 c.on('drain', () => {
-  // For example, release a connection to database.
   console.log('\n\n\-----------------------------------'.red)
   console.log('------------------任务调用完成---------'.red)
   console.log('-----------------------------------\n\n'.red)
@@ -239,14 +208,6 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
             if (error) {
               console.log(error);
             } else {
-
-              if (prefixUrl === 'xdf') {
-                const dictkk = ({
-                  name: cihui,
-                  url: res.request.uri.href
-                })
-                fs.appendFileSync(`新东方dicturl.txt`, JSON.stringify(dictkk) + ',')
-              } else {
                 let $ = res.$;
 
                 if (!$) {
@@ -258,7 +219,6 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
                 count++
 
                 console.log("数据写入成功！-----html源码", cihui.red, count.toString().yellow, lengthd.toString().bgYellow);
-              }
             }
             done();
           }

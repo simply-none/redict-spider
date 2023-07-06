@@ -1,16 +1,12 @@
 const Crawler = require('crawler');
 var fs = require("fs");
 
-// 词源：需要进行查询的单词文件，格式是{cihui: []}
+// 词源：需要进行查询的单词文件，格式是字符串数组
+var cihui = require('./新东方测试new.json')
 
-var cihui = require('./新东方endurl.json')
+let exists = require('./allwords')
 
-var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
-
-
-// 词性：part of speech
-// var POS = 
-// 名词(none)、 动词(verb)、 形容词(adjective)、 副词(adverb)、 冠词(article)、 代词(pronoun)、 数词(numeral)、介词(preposition)、 连词(conjunction)、 感叹词(interjection)
+console.log(exists.length, 'ces')
 
 require('colors')
 
@@ -27,19 +23,8 @@ function sleep(time) {
 
 const c = new Crawler({
   headers: {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
-    "sec-ch-ua": "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"",
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": "\"Windows\"",
-    "sec-fetch-dest": "document",
-    "sec-fetch-mode": "navigate",
-    "sec-fetch-site": "same-origin",
-    "sec-fetch-user": "?1",
-    "upgrade-insecure-requests": "1",
-    "cookie": "__jsluid_s=1542f9154b8f634c285b7d1ecaf9e32c; KUID=s18bj11686837725166; _ga=GA1.2.230887278.1686837726; __jsluid_h=873ba27ec76ae117eea0e1f8d758eb3e; Hm_lvt_a78730c23915ac97dab8434b52be3e7d=1686837799; gr_user_id=9de994ea-8f20-4e21-82e5-f485ea10ef4f; _gid=GA1.2.742312332.1687452916; _csrf=93cfde206d5fac331ae65d417abc54428e215a82a1cec221c808f404c23026cba%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22sfIu4ZxWfQasdlXgfZbLue-MVj4Pr0KP%22%3B%7D; php-webapp-dict=5f4d489271c5f4830d1ec39a7b846449; log.session=134fd7adae2e98509eddfa358057e80e; Hm_lvt_5023f5fc98cfb5712c364bb50b12e50e=1686837725,1687452916,1687484799,1687503248; wwwad=true; Hm_lpvt_5023f5fc98cfb5712c364bb50b12e50e=1687516850; prelogid=2d50c51c19f832160d955a6fa3148b70; koo.line=un; _gat=1; _ga_8RBHSP5JM6=GS1.2.1687516852.4.0.1687516852.60.0.0",
-    "Referer": "https://www.koolearn.com/dict/wd_156384.html",
-    "Referrer-Policy": "no-referrer-when-downgrade"
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    "cookie": "__jsluid_s=3b151ea47832df6d672c5d6ef1e85adb; KUID=f9ufqg1687744936417; _ga=GA1.2.978356362.1687744937; _csrf=19664b91032ab197be23570ac3630244da2d2ff6699b669a9df26ff7ce83bdd0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22SJ39hd8T_glVCFTBAy44atcGbVpDJ9DF%22%3B%7D; php-webapp-dict=63df0281ff3858097dbd2665fdaecb90; log.session=f140b56f9f3de3b9bd40e9d46149ddeb; koo.line=un; Hm_lvt_5023f5fc98cfb5712c364bb50b12e50e=1687744936,1688021791,1688608384; Hm_lpvt_5023f5fc98cfb5712c364bb50b12e50e=1688608384; k12-ui-www-pc=afa2fe87d75ece2f14fefa3a1d97aa09; prelogid=4a6f0c6666ad02b126d7e8df9dae6783; _gid=GA1.2.1680551020.1688608385; _gat=1; _ga_8RBHSP5JM6=GS1.2.1688608386.5.0.1688608386.60.0.0; wwwad=true",
   },
   retries: 1,
   rateLimit: 2000,
@@ -78,9 +63,14 @@ const test = {
 let dictfile = []
 
 let rawDataDir = './koolearn.com/html'; // 源文件所在文件夹
+
+if (!fs.existsSync(rawDataDir)) {
+  fs.mkdirSync(rawDataDir, { recursive: true });
+}
+
 // 2. 读取源文件夹下的所有文件，批量处理
-if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测目录是否存在，返回boolean
-  let files = fs.readdirSync(rawDataDir); // fs.readdirSync(path) 方法将返回该路径下所有文件名的数组。
+if (fs.existsSync(rawDataDir)) {
+  let files = fs.readdirSync(rawDataDir);
   for (let i = 0; i < files.length; i++) {
     const fileName = files[i];
 
@@ -93,9 +83,10 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
   cihui = cihui.filter(word => !rawDataq.includes(word.name.toLowerCase()))
   cihui = cihui.filter(word => !exists.includes(word.name.toLowerCase()))
 
-
-
   let cihui_len = cihui.length
+
+  console.log(cihui_len)
+  // return false
 
   cihui.forEach((cihui, index) => {
 
@@ -107,7 +98,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
     let url = encodeURI(cihui.url)
 
     c.queue([{
-      proxy: 'http://127.0.0.1:7890',
+      // proxy: 'http://127.0.0.1:7890',
       uri: url,
       // uri: 'http://localhost:3000/koolearn.com/html/get up.html',
       // uri: encodeURI('https://www.koolearn.com/enzh/' + 'against'),
@@ -129,15 +120,11 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
       },
       callback: (error, res, done) => {
         test.req++
-        // console.log(JSON.stringify(test).bgBlue)
         console.log('\n')
-        console.log('------------------请求开始---------------------'.bgGreen, cihui.name.red, index.toString().green, cihui_len.toString().red)
-        // console.log(res.request.uri.href, '当前请求的url')
+        console.log('------------------start---------------------'.bgGreen, cihui.name.red, index.toString().green, cihui_len.toString().red)
         if (error) {
           console.log(error);
         } else {
-
-          // console.log(Object.keys(res.request), '测试', res.request.response)
 
           let $ = res.$;
 
@@ -145,7 +132,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
 
           count++
 
-          console.log("数据写入成功！-----html源码", cihui.name.red, count.toString().yellow);
+          console.log("success source!", cihui.name.red, count.toString().yellow);
 
         }
         done();
