@@ -16,16 +16,31 @@ var cihui = require('./单词分类/vuejs-doc-words.json')
 
 var exist = require('./allwords')
 
-cihui = cihui.concat(exist)
-
-cihui = [...new Set(cihui)]
-
-console.log(cihui.length)
-
 let prefixUrl = "voc";
 let requestUrl = "";
 let dwn = "";
 
+if (prefixUrl === 'cls') {
+  exist = exist.map((w) => w.toLowerCase());
+  cihui = cihui.filter((w) => !exist.includes(w.toLowerCase()));
+}
+
+if (prefixUrl === 'voc') {
+  cihui = cihui.concat(exist)
+}
+
+cihui = [...new Set(cihui)]
+
+cihui.sort(function(a, b) {
+  if (a > b) {
+    return 1
+  }
+  return -1
+})
+
+cihui = cihui.filter(w => delSpace(w))
+
+console.log(cihui.length)
 
 switch (prefixUrl) {
   case "lw":
@@ -74,7 +89,6 @@ switch (prefixUrl) {
     dwn = "vocabulary.com";
     break;
 }
-
 
 console.log(cihui.length, "len");
 
@@ -136,7 +150,7 @@ async function init() {
     // proxyConfiguration,
     maxRequestsPerCrawl: 3000,
     maxConcurrency: 1,
-    maxRequestsPerMinute: 20,
+    maxRequestsPerMinute: 60,
     requestList,
     requestQueue,
     // The `$` argument is the Cheerio object
@@ -147,6 +161,10 @@ async function init() {
       // See Cheerio documentation for API docs.
 
       let name = res.request.url.split('https://www.vocabulary.com/dictionary/')
+
+      if (prefixUrl === 'cls') {
+        name = res.request.url.split('https://www.collinsdictionary.com/zh/dictionary/english-chinese/')
+      }
 
       name = name[1] || 'a_error_error'
 
@@ -161,4 +179,8 @@ async function init() {
 
   // Start the crawler and wait for it to finish
   await crawler.run();
+}
+
+function delSpace(str) {
+  return str.replace(/^\s+|\s+$/g, "");
 }

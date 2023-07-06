@@ -12,9 +12,9 @@ cihui = cihui.filter((w) => !exist.includes(w.toLowerCase()));
 cihui = [...new Set(cihui)];
 
 console.log(cihui.length);
-return false;
+// return false;
 
-let prefixUrl = "voc";
+let prefixUrl = "hj";
 let requestUrl = "";
 let dwn = "";
 
@@ -87,8 +87,7 @@ const test = {
 
 const c = new Crawler({
   headers: {
-    cookie:
-      "llang=enzhi; _pbjs_userid_consent_data=3524755945110770; _sharedid=aa3c30d4-efe5-4b3b-9d38-a3051d7b24cf; __gads=ID=1287f16a8d27799c:T=1687228433:RT=1687228433:S=ALNI_Mah1D8camy0Qc-WAojJf1TVXKSn7Q; __gpi=UID=00000c14cf6e84bc:T=1687228433:RT=1687228433:S=ALNI_Ma9-wzZgTj-b3XN0Zi3WrcOQP-pHQ; cto_bundle=yHoMr18lMkZiOFNSc0dhN21TWWpIMkZwT0VTJTJCbnZuQW9uVmo4V1pNbkZOJTJGdElYa3JQYSUyRkNlYjN3R0RtUHFVSGdJdzltUE82Y2p0ZnhoRkR6M3ZHa1BLR0l4MlRXMUg2cDB6RTVENXpHQzhvSUlWMWMxMGM4bklzb2pObEFwRElYQUpxMUo2RSUyQjRpVVl0dHZLaVB3ckFyRGlIWGxRJTNEJTNE; cto_bidid=mn1tg18xNmhObjZCc0dHUkZMczZncDBLTHlkYkVuYnFrWU5oTVpGb1ZxWVRZSWdEeDFIU05JUnNsN0pQWVIwYXp1MWgwd1Zqd3pMWkhKejBCa0FVaEVHU1lWJTJCSVZSeDBFUUslMkZFdDBUNWJtVjZ0YmQ3QTBsM05hQUtVSkh5WGx1a1pZTWo; FCNEC=%5B%5B%22AKsRol9d_qXOQ4gLqp5UDiUb-PLRfeg7PEdIfAa7SBG5UzJxNnybFMoCQFoDYFj0-V2qIjETgSVChL4KsljWP8vtoMADv4zviy8l0GcwA6jCQ-t5Ml6myLJEs8lNx5rluOFGPqC-Mr4Vdmet6j3WEdxQi9KMQ0a7OQ%3D%3D%22%5D%2Cnull%2C%5B%5D%5D; _ga=GA1.1.326739331.1687135003; _ga_WV46ZWEMKW=GS1.1.1687758932.9.0.1687758932.60.0.0",
+    cookie: `HJ_UID=1575512c-1a27-8ad1-0179-ab9db0bf4294; TRACKSITEMAP=3; _REF=; _SREF_3=; acw_tc=76b20f6216886273550305613e04e0b23b48fcb36f843323ebed49d9899e9a; HJ_CST=0; HJ_SID=z7l5b0-00a8-4c15-a5f8-38bd54b13faf; HJ_SSID_3=z7l5b0-a89a-43d2-8f31-1240315cfe41; HJ_CSST_3=1; _SREG_3=direct%7C%7Cdirect%7Cdirect; _REG=direct%7C%7Cdirect%7Cdirect`,
     "User-Agent":
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     "Referrer-Policy": "no-referrer-when-downgrade",
@@ -96,7 +95,7 @@ const c = new Crawler({
   // http2: true,
 
   retries: 1,
-  rateLimit: 3000,
+  rateLimit: 2000,
   maxConnections: 10,
   // This will be called for each crawled page
   callback: (error, res, done) => {

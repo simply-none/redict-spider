@@ -52,20 +52,19 @@ let json2csvCallback = function (err, csv) {
     });
 };
 
-var cihui = require('./单词分类/gre词汇(除初考外).json')
-var cihui2 = require('./单词分类/初中高中四级词汇.json')
-var cihui3 = require('./单词分类/考研六级托福SAT词汇.json')
-var exists = require('./单词分类/已下载但未过滤的词汇汇总.json')
+var cihui = require('./单词分类/vuejs-doc-words.json')
 
+var exist = require('./allwords')
 
-let all_word_in_file = cihui.concat(cihui2, cihui3, exists)
+  exist = exist.map((w) => w.toLowerCase());
+  cihui = cihui.filter((w) => !exist.includes(w.toLowerCase()));
 
-all_word_in_file = [...new Set(all_word_in_file)]
+cihui = [...new Set(cihui)]
 
 
 // exists = exists.map(w => w.toLowerCase())
 
-let rawDataDir = './' + 'vocabulary.com' + '/html'; // 源文件所在文件夹
+let rawDataDir = './' + 'collinsdictionary.com' + '/html'; // 源文件所在文件夹
 // 2. 读取源文件夹下的所有文件，批量处理
 let rawDataq = []
 if (!fs.existsSync(rawDataDir)) {
@@ -84,20 +83,20 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
 
   rawDataq = rawDataq.map(w => w.toLowerCase())
 
-  all_word_in_file = all_word_in_file.filter(w => !rawDataq.includes(w.toLowerCase()))
+  cihui = cihui.filter(w => !rawDataq.includes(w.toLowerCase()))
 }
 
-// all_word_in_file = all_word_in_file.filter(w => !exists.includes(w.toLowerCase()))
+// cihui = cihui.filter(w => !exists.includes(w.toLowerCase()))
 
-all_word_in_file = all_word_in_file.map(word => {
+cihui = cihui.map(word => {
     return {
       query: word
     }
   })
 
-console.log(all_word_in_file.length, 'end')
+console.log(cihui.length, 'end')
 
-jsontocsc.json2csv(all_word_in_file, json2csvCallback, {
+jsontocsc.json2csv(cihui, json2csvCallback, {
     // prependHeader: false      // removes the generated header of "value1,value2,value3,value4" (in case you don't want it)
   }).then(res => {
     json2csvCallback('', res)
@@ -131,11 +130,11 @@ app.post('/write', (req, res) => {
     const { data,fileName } = req.body
     // console.log(req)
     console.log(fileName.url)
-    const fileNamePath = fileName.url.path[1]
+    const fileNamePath = fileName.url.path[3]
     count++
     console.log(fileNamePath, count.toString().red)
 
-    fs.writeFileSync('./vocabulary.com/html/'+fileNamePath+'.html', data, 'utf8');
+    fs.writeFileSync('./collinsdictionary.com/html/'+fileNamePath+'.html', data, 'utf8');
     res.send('Success');
 });
 
