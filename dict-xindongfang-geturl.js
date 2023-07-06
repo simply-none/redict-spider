@@ -86,9 +86,6 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
       jQuery: true,
       callback: (error, res, done) => {
         test.req++
-        // console.log(JSON.stringify(test).bgBlue)
-        console.log('\n')
-        console.log('------------------请求开始---------------------'.bgGreen, cihui.red, index.toString().green, lengthd.toString().yellow)
         // console.log(res.request.uri.href, '当前请求的url')
         if (error) {
           console.log(error);
@@ -99,6 +96,8 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
           })
 
           fs.appendFileSync('./新东方测试neww.json', JSON.stringify(dictkk) + ',')
+          count++
+          console.log(`start ${cihui} ratio: ${count}/${lengthd}`.red);
 
         }
         done();

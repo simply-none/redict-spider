@@ -26,6 +26,7 @@ let prefixUrl = "voc";
 let requestUrl = "";
 let dwn = "";
 
+
 switch (prefixUrl) {
   case "lw":
     requestUrl = "https://www.ldoceonline.com/dictionary/";
@@ -104,6 +105,7 @@ cihui = cihui.filter((w) => {
 });
 
 let lengthd = cihui.length;
+let count = 0
 
 console.log(lengthd, "len");
 
@@ -148,12 +150,12 @@ async function init() {
 
       name = name[1] || 'a_error_error'
 
-      console.log(`start ${name}`.red);
-
       fs.writeFileSync(
         "./" + dwn + "/html/" + encodeURIComponent(name) + ".html",
         actorText || ""
       );
+      count++
+      console.log(`start ${name} ratio: ${count}/${lengthd}`.red);
     },
   });
 
