@@ -2,7 +2,7 @@ const Crawler = require('crawler');
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是字符串数组
-var cihui = require('./单词分类/vuejs-doc-words.json')
+var cihui = require('./notDwnWordsInCocaHaici')
 
 var exist = require('./allwords')
 
@@ -19,10 +19,10 @@ function delSpace (str) {
 const c = new Crawler({
   headers: {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-    "cookie": "__jsluid_s=3b151ea47832df6d672c5d6ef1e85adb; KUID=f9ufqg1687744936417; _ga=GA1.2.978356362.1687744937; _csrf=19664b91032ab197be23570ac3630244da2d2ff6699b669a9df26ff7ce83bdd0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22SJ39hd8T_glVCFTBAy44atcGbVpDJ9DF%22%3B%7D; php-webapp-dict=63df0281ff3858097dbd2665fdaecb90; log.session=f140b56f9f3de3b9bd40e9d46149ddeb; koo.line=un; Hm_lvt_5023f5fc98cfb5712c364bb50b12e50e=1687744936,1688021791,1688608384; Hm_lpvt_5023f5fc98cfb5712c364bb50b12e50e=1688608384; k12-ui-www-pc=afa2fe87d75ece2f14fefa3a1d97aa09; prelogid=4a6f0c6666ad02b126d7e8df9dae6783; _gid=GA1.2.1680551020.1688608385; _gat=1; _ga_8RBHSP5JM6=GS1.2.1688608386.5.0.1688608386.60.0.0; wwwad=true",
+    "cookie": "__jsluid_s=3b151ea47832df6d672c5d6ef1e85adb; KUID=f9ufqg1687744936417; _ga=GA1.2.978356362.1687744937; _csrf=04c32d14dac3f3c8c825ba759393d5059fd907f7f3d93d6c893d38c2649141caa%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22-drvyEI6ZCMP3D1HKe0ETNdF558zPWbl%22%3B%7D; php-webapp-dict=63df0281ff3858097dbd2665fdaecb90; log.session=01f75d7cc125d5102eb6739392f9c4c1; koo.line=un; prelogid=8ba8bdf7f5b92845c03e1cc059d492a3; _gid=GA1.2.1197940991.1688700210; _gat=1; _ga_8RBHSP5JM6=GS1.2.1688700211.6.0.1688700211.60.0.0; Hm_lvt_5023f5fc98cfb5712c364bb50b12e50e=1687744936,1688021791,1688608384,1688700213; Hm_lpvt_5023f5fc98cfb5712c364bb50b12e50e=1688700213; wwwad=true",
   },
   retries: 1,
-  rateLimit: 2000,
+  rateLimit: 3000,
   maxConnections: 10,
   // This will be called for each crawled page
   callback: (error, res, done) => {
@@ -95,7 +95,7 @@ if (fs.existsSync(rawDataDir)) { // fs.existsSync(path)以同步的方法检测�
             url: res.request.uri.href
           })
 
-          fs.appendFileSync('./新东方测试neww.json', JSON.stringify(dictkk) + ',')
+          fs.appendFileSync('./新东方测试url.json', JSON.stringify(dictkk) + ',')
           count++
           console.log(`start ${cihui} ratio: ${count}/${lengthd}`.red);
 

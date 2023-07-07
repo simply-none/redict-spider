@@ -20,6 +20,8 @@ let prefixUrl = "voc";
 let requestUrl = "";
 let dwn = "";
 
+let startTime = Date.now()
+
 if (prefixUrl === 'cls') {
   exist = exist.map((w) => w.toLowerCase());
   cihui = cihui.filter((w) => !exist.includes(w.toLowerCase()));
@@ -173,7 +175,9 @@ async function init() {
         actorText || ""
       );
       count++
-      console.log(`start ${name} ratio: ${count}/${lengthd}`.red);
+      let endTime = Date.now()
+      let cha = ((endTime - startTime) / 1000 / 60).toFixed(2)
+      console.log(`${name}, r: ${count}/${lengthd}, t: ${cha}min`.red);
     },
   });
 
