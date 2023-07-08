@@ -100,7 +100,12 @@ switch (prefixUrl) {
 
 // dwn = 'test-test'
 
-let rawDataDir = "./" + dwn + "/data"; // 源文件所在文件夹
+/**
+ * 
+ * --------------------------源json数据文件所在文件夹------------------
+ * 
+ */
+let rawDataDir = "./dict-html/" + dwn + "/data/"; // 源文件所在文件夹
 // 2. 读取源文件夹下的所有文件，批量处理
 
 if (!fs.existsSync(rawDataDir)) {
@@ -116,17 +121,13 @@ for (let i = 0; i < files.length; i++) {
 
   fileName = decodeURIComponent(fileName);
   flleStr = decodeURIComponent(fileName).split(".json")[0];
-  // if (fs.existsSync("./" + dwn + "/data/" + flleStr + ".json")) {
-  //   continue
-  // }
-
+  
   cacheData(
-    ("./" + dwn + "/data/" + encodeURIComponent(fileName)),
-    ("./" + dwn + encodeURIComponent(flleStr) + ".json")
+    (rawDataDir + encodeURIComponent(fileName))
   );
 }
 
-fs.writeFileSync(("./提取新东方总数据" + ".json"), JSON.stringify(jsonData), (err) => {
+fs.writeFileSync((`./提取${dwn}总数据.json`), JSON.stringify(jsonData), (err) => {
   console.log(err, Date.now().toString().bgRed);
 });
 
