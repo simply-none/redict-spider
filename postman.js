@@ -52,12 +52,16 @@ let json2csvCallback = function (err, csv) {
     });
 };
 
-var cihui = require('./单词分类/vuejs-doc-words.json')
+var cihui = require('./notDwnWordsInCocaHaici')
 
 var exist = require('./allwords')
 
   exist = exist.map((w) => w.toLowerCase());
   cihui = cihui.filter((w) => !exist.includes(w.toLowerCase()));
+
+  var notDwn2 = require('./notDwn2.json')
+
+  cihui = cihui.concat(notDwn2)
 
 cihui = [...new Set(cihui)]
 

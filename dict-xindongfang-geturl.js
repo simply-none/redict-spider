@@ -2,17 +2,17 @@ const Crawler = require('crawler');
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是字符串数组
-var cihui = require('./notDwnWordsInCocaHaici')
+var cihui = require('./notDwn2.json')
 
-var exist = require('./allwords')
+// var exist = require('./allwords')
 
-var urlq = require('./提取url.json')
+// var urlq = require('./提取url.json')
 
-urlq = urlq.map(u => u.name.toLowerCase())
+// urlq = urlq.map(u => u.name.toLowerCase())
 
-cihui = cihui.filter(w => !exist.includes(w.toLowerCase()))
+// cihui = cihui.filter(w => !exist.includes(w.toLowerCase()))
 
-cihui = cihui.filter(w => !urlq.includes(w.toLowerCase()))
+// cihui = cihui.filter(w => !urlq.includes(w.toLowerCase()))
 
 require('colors')
 

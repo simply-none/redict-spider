@@ -7,7 +7,11 @@ var cihui = require("./notDwnWordsInCocaHaici");
 var exist = require("./allwords");
 exist = exist.map((w) => w.toLowerCase());
 
+var notDwn2 = require('./notDwn2.json')
+
 cihui = cihui.filter((w) => !exist.includes(w.toLowerCase()));
+
+cihui = cihui.concat(notDwn2)
 
 cihui = [...new Set(cihui)];
 
