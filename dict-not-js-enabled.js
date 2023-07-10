@@ -2,7 +2,7 @@ const Crawler = require("crawler");
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是{cihui: []}
-var cihui = require("./单词分类/vuejs-doc-words.json");
+var cihui = require("./notDwnWordsInCocaHaici");
 
 var exist = require("./allwords");
 exist = exist.map((w) => w.toLowerCase());
@@ -14,7 +14,7 @@ cihui = [...new Set(cihui)];
 console.log(cihui.length);
 // return false;
 
-let prefixUrl = "hj";
+let prefixUrl = "jq";
 let requestUrl = "";
 let dwn = "";
 
@@ -85,9 +85,11 @@ const test = {
   req: 0,
 };
 
+let startTime = Date.now()
+
 const c = new Crawler({
   headers: {
-    cookie: `HJ_UID=1575512c-1a27-8ad1-0179-ab9db0bf4294; TRACKSITEMAP=3; _REF=; _SREF_3=; acw_tc=76b20f6216886273550305613e04e0b23b48fcb36f843323ebed49d9899e9a; HJ_CST=0; HJ_SID=z7l5b0-00a8-4c15-a5f8-38bd54b13faf; HJ_SSID_3=z7l5b0-a89a-43d2-8f31-1240315cfe41; HJ_CSST_3=1; _SREG_3=direct%7C%7Cdirect%7Cdirect; _REG=direct%7C%7Cdirect%7Cdirect`,
+    cookie: `preferredDictionaries="english-chinese-simplified,english,british-grammar,english-spanish,spanish-english"; _ga=GA1.3.1313493786.1687675151; amp-access=amp-D4I4I-2LslUN7jN2KsHGnw; _pbjs_userid_consent_data=3524755945110770; _sharedID=45a7e498-81d9-4547-9366-2b0b0eca2738; _lr_env_src_ats=false; pbjs-unifiedid=%7B%22TDID%22%3A%220b03f864-ad8e-42e5-a513-645318ca5ddd%22%2C%22TDID_LOOKUP%22%3A%22TRUE%22%2C%22TDID_CREATED_AT%22%3A%222023-05-25T06%3A39%3A17%22%7D; _hjSessionUser_2790984=eyJpZCI6ImUzNTZhZTdkLTE4MDItNTg3ZS05YzFkLTA4OWY1Yzk0ZjFhMiIsImNyZWF0ZWQiOjE2ODc2NzUxNTMyMTMsImV4aXN0aW5nIjp0cnVlfQ==; cto_bidid=e71-o19CbkxSJTJCUlRJVjNIMGViJTJGaGFpcUhmN2owRnBGcFd5Z0FodVRZcVlEejBwQnlNVzZiQnluN0VQbEh2JTJGVnFYWDFjYk1kNENjYm5JWXpEZUxGSXZSVTlPMk9vQ2FoOGYlMkIxUHJGYVElMkJ6JTJGSHJZZyUzRA; OptanonConsent=isGpcEnabled=0&datestamp=Thu+Jul+06+2023+14%3A51%3A15+GMT%2B0800+(%E4%B8%AD%E5%9B%BD%E6%A0%87%E5%87%86%E6%97%B6%E9%97%B4)&version=202303.2.0&browserGpcFlag=0&isIABGlobal=false&hosts=&landingPath=NotLandingPage&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1%2CC0004%3A0&AwaitingReconsent=false; iawpvccs=1; iawsc1m=5; iawpvc=7; iawpvtc1m=7; _sp_id.7ecc=b8973dad-0ddb-47bc-99c8-6a33de37ac30.1687675152.4.1688626333.1687912696.33760827-563e-4e16-91e1-2580a3617ca7.7546fce3-77ae-4e3d-8068-e84ec85d9af8.570264a5-c137-44c7-9525-d8a73f78eef5.1688626270811.3; cto_bundle=0pknzV9BYkclMkJsTjVDSGhmM3MxVlBYOHp0S1d1ZjdteFFrbDBBaSUyQlhpa2lTbVI5MkZIQ3pDbHQ1ZndLYmtzR3dEOSUyQlFUeHAyZzlVZXM0MVhaJTJGRXYxbnUwdng1Rmx5NTlSUHREelVqRDRIRiUyRml0V0xEUTdiWENDTDhRSWlocWI4ZmVjeWY3eUxzM0tNQmFLZTdLYUlKMXFOVGFBJTNEJTNE; _ga_L9GCR21SZ7=GS1.3.1688626270.5.0.1688626378.60.0.0`,
     "User-Agent":
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     "Referrer-Policy": "no-referrer-when-downgrade",
@@ -95,7 +97,7 @@ const c = new Crawler({
   // http2: true,
 
   retries: 1,
-  rateLimit: 2000,
+  rateLimit: 2700,
   maxConnections: 10,
   // This will be called for each crawled page
   callback: (error, res, done) => {
@@ -208,8 +210,9 @@ if (fs.existsSync(rawDataDir)) {
               );
 
               count++;
-
-              console.log(`start ${cihui} ratio: ${count}/${lengthd}`.red);
+              let endTime = Date.now()
+              let cha = ((endTime - startTime) / 1000 / 60).toFixed(2)
+              console.log(`${cihui}, r: ${count}/${lengthd}, t: ${cha}min`.red);
             }
             done();
           },

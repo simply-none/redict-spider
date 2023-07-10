@@ -16,6 +16,8 @@ var cihui = require('./单词分类/vuejs-doc-words.json')
 
 var exist = require('./allwords')
 
+var notw = require('./notDwnWordsInCocaHaici')
+
 let prefixUrl = "voc";
 let requestUrl = "";
 let dwn = "";
@@ -28,7 +30,7 @@ if (prefixUrl === 'cls') {
 }
 
 if (prefixUrl === 'voc') {
-  cihui = cihui.concat(exist)
+  cihui = cihui.concat(exist, notw)
 }
 
 cihui = [...new Set(cihui)]
@@ -150,7 +152,7 @@ async function init() {
   // and a request handler to process the page.
   const crawler = new PlaywrightCrawler({
     // proxyConfiguration,
-    maxRequestsPerCrawl: 3000,
+    maxRequestsPerCrawl: 30000,
     maxConcurrency: 1,
     maxRequestsPerMinute: 60,
     requestList,

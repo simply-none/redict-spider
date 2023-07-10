@@ -6,7 +6,13 @@ var cihui = require('./notDwnWordsInCocaHaici')
 
 var exist = require('./allwords')
 
+var urlq = require('./提取url.json')
+
+urlq = urlq.map(u => u.name.toLowerCase())
+
 cihui = cihui.filter(w => !exist.includes(w.toLowerCase()))
+
+cihui = cihui.filter(w => !urlq.includes(w.toLowerCase()))
 
 require('colors')
 

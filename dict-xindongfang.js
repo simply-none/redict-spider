@@ -2,11 +2,11 @@ const Crawler = require('crawler');
 var fs = require("fs");
 
 // 词源：需要进行查询的单词文件，格式是字符串数组
-var cihui = require('./新东方测试new.json')
+var cihui = require('./提取url.json')
 
-let exists = require('./allwords')
+// let exists = require('./allwords')
 
-console.log(exists.length, 'ces')
+// console.log(exists.length, 'ces')
 
 require('colors')
 
@@ -24,7 +24,7 @@ function sleep(time) {
 const c = new Crawler({
   headers: {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-    "cookie": "__jsluid_s=3b151ea47832df6d672c5d6ef1e85adb; KUID=f9ufqg1687744936417; _ga=GA1.2.978356362.1687744937; _csrf=19664b91032ab197be23570ac3630244da2d2ff6699b669a9df26ff7ce83bdd0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22SJ39hd8T_glVCFTBAy44atcGbVpDJ9DF%22%3B%7D; php-webapp-dict=63df0281ff3858097dbd2665fdaecb90; log.session=f140b56f9f3de3b9bd40e9d46149ddeb; koo.line=un; Hm_lvt_5023f5fc98cfb5712c364bb50b12e50e=1687744936,1688021791,1688608384; Hm_lpvt_5023f5fc98cfb5712c364bb50b12e50e=1688608384; k12-ui-www-pc=afa2fe87d75ece2f14fefa3a1d97aa09; prelogid=4a6f0c6666ad02b126d7e8df9dae6783; _gid=GA1.2.1680551020.1688608385; _gat=1; _ga_8RBHSP5JM6=GS1.2.1688608386.5.0.1688608386.60.0.0; wwwad=true",
+    "cookie": "__jsluid_s=3b151ea47832df6d672c5d6ef1e85adb; KUID=f9ufqg1687744936417; _ga=GA1.2.978356362.1687744937; Hm_lvt_5023f5fc98cfb5712c364bb50b12e50e=1687744936,1688021791,1688608384,1688700213; _ga_8RBHSP5JM6=GS1.2.1688708023.7.1.1688708049.34.0.0; Hm_lvt_a78730c23915ac97dab8434b52be3e7d=1688708057; _csrf=67050f40cbf9d31274471815c0e1add946627f519a421ea71e70d149fc8dc953a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22CPu5aU2rmXc_r01m_vb9b69Q74MzN3kW%22%3B%7D; php-webapp-dict=63df0281ff3858097dbd2665fdaecb90; k12-ui-www-pc=a32ee7c930a9cd4d68440c291beb1c41; log.session=29bae3f4c3fe0fc0de027535de080cfb; koo.line=un; prelogid=10360c2e320a8edf38303ebc13fc81ae; _gid=GA1.2.349539099.1688955206; _gat=1",
   },
   retries: 1,
   rateLimit: 2000,
@@ -78,10 +78,10 @@ if (fs.existsSync(rawDataDir)) {
   }
 
   rawDataq = rawDataq.map(w => decodeURIComponent(w).toLowerCase())
-  exists = exists.map(w => decodeURIComponent(w).toLowerCase())
+  // exists = exists.map(w => decodeURIComponent(w).toLowerCase())
 
   cihui = cihui.filter(word => !rawDataq.includes(word.name.toLowerCase()))
-  cihui = cihui.filter(word => !exists.includes(word.name.toLowerCase()))
+  // cihui = cihui.filter(word => !exists.includes(word.name.toLowerCase()))
 
   let cihui_len = cihui.length
 
@@ -120,8 +120,6 @@ if (fs.existsSync(rawDataDir)) {
       },
       callback: (error, res, done) => {
         test.req++
-        console.log('\n')
-        console.log('------------------start---------------------'.bgGreen, cihui.name.red, index.toString().green, cihui_len.toString().red)
         if (error) {
           console.log(error);
         } else {
@@ -132,7 +130,7 @@ if (fs.existsSync(rawDataDir)) {
 
           count++
 
-          console.log("success source!", cihui.name.red, count.toString().yellow);
+          console.log(`${cihui.name}: ${count} / ${cihui_len}`.red);
 
         }
         done();
