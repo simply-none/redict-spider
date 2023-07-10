@@ -100,11 +100,25 @@ switch (prefixUrl) {
 
 // dwn = 'test-test'
 
-let rawDataDir = "./" + dwn + "/html"; // 源文件所在文件夹
+/**
+ * 
+ * ----------------------------- 读取的html源文件目录------------------------------
+ * 
+ */
+let rawDataDir = "../dict-html/" + dwn + "/html/"; // 源文件所在文件夹
+/**
+ * 
+ * -------------------------------存储的数据目录
+ * 
+ */
+let rawDataJsonDir = './dict-html/' + dwn + '/data/'
+
+
+
 // 2. 读取源文件夹下的所有文件，批量处理
 
-if (!fs.existsSync(rawDataDir)) {
-  fs.mkdirSync(rawDataDir, { recursive: true });
+if (!fs.existsSync(rawDataJsonDir)) {
+  fs.mkdirSync(rawDataJsonDir, { recursive: true });
 }
 
 let files = fs.readdirSync(rawDataDir); // fs.readdirSync(path) 方法将返回该路径下所有文件名的数组。
@@ -114,13 +128,13 @@ for (let i = 0; i < files.length; i++) {
 
   fileName = decodeURIComponent(fileName);
   flleStr = decodeURIComponent(fileName).split(".html")[0];
-  if (fs.existsSync("./" + dwn + "/data/" + flleStr + ".json")) {
+  if (fs.existsSync(rawDataJsonDir + flleStr + ".json")) {
     continue
   }
 
   cacheData(
-    ("./" + dwn + "/html/" + encodeURIComponent(fileName)),
-    ("./" + dwn + "/data/" + encodeURIComponent(flleStr) + ".json")
+    (rawDataDir + encodeURIComponent(fileName)),
+    (rawDataJsonDir + encodeURIComponent(flleStr) + ".json")
   );
 }
 
