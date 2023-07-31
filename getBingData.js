@@ -255,6 +255,7 @@ function cacheData(path, savePath) {
               t: item[0],
               // 单词
               v: dic,
+              // 🛑增加（相比于xdf）
               l: link,
             };
           })
@@ -354,6 +355,7 @@ function cacheData(path, savePath) {
                 return {
                   en: delSpace(en.text()),
                   zh: delSpace(zh.text()),
+                  // 🛑增加（相比于xdf）
                   exm: exm || [],
                 };
               })
@@ -392,7 +394,9 @@ function cacheData(path, savePath) {
                 return {
                   en: delSpace(en.text()),
                   zh: delSpace(zh.text()),
+                  // 🛑增加（相比于xdf）
                   zhen: delSpace(zhen.text()),
+                  // 🛑增加（相比于xdf）
                   exm: exm || [],
                 };
               })
@@ -439,6 +443,7 @@ function cacheData(path, savePath) {
               {
                 t: "搭配",
                 st: type.text(),
+                // 🛑修改为对象（相比于xdf，原始为字符串）
                 stl,
               },
             ],
@@ -448,7 +453,7 @@ function cacheData(path, savePath) {
 
       vocabulary.col = cihuidapie;
 
-      // 同义词反义词vocabulary.oth = rightBox;
+      // 同义词反义词
       let tongyici = $(this)
         .find("#synoid .df_div2")
         .map(function () {
