@@ -105,7 +105,7 @@ switch (prefixUrl) {
  * ----------------------------- 读取的html源文件目录------------------------------
  *
  */
-let rawDataDir = "./" + dwn + "/html/"; // 源文件所在文件夹
+let rawDataDir = "../dict-html/" + dwn + "/html/"; // 源文件所在文件夹
 /**
  *
  * -------------------------------存储的数据目录
@@ -120,6 +120,7 @@ if (!fs.existsSync(rawDataJsonDir)) {
 }
 
 let files = fs.readdirSync(rawDataDir); // fs.readdirSync(path) 方法将返回该路径下所有文件名的数组。
+let toggle = 0
 console.log(files.length);
 for (let i = 0; i < files.length; i++) {
   let fileName = files[i];
@@ -180,7 +181,8 @@ function cacheData(path, savePath) {
   let title = $("#headword");
 
   if (title.length === 0) {
-    console.log(path, "当前查找的单词无解释说明".bgRed);
+    toggle++
+    console.log(path, "当前查找的单词无解释说明".bgRed, toggle);
     return false;
   }
 
@@ -508,6 +510,24 @@ function cacheData(path, savePath) {
       ];
     }
   });
+
+  let hasTruth = Object.keys(vocabulary).some(key => {
+    let a = ['ps', 'pd']
+    if (!a.includes(key)) {
+      return false
+    }
+    if (key === 'ps' && vocabulary[key].length === 1 && vocabulary[key][0].t === '网络') {
+      return false
+    }
+    return vocabulary[key].length > 0
+  })
+
+  if (!hasTruth) {
+    toggle++
+
+    console.log('当前单词无释义', vocabulary.n, toggle)
+    return false
+  }
 
   fs.writeFileSync(savePath, JSON.stringify(vocabulary), (err) => {
     console.log(err, Date.now().toString().bgRed);
