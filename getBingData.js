@@ -228,7 +228,7 @@ function cacheData(path, savePath) {
       simpleDescContentDetailItem.map(function (index, element) {
         let type = $(this).find(".pos").text() || "无";
 
-        let desc = $(this).find(".def").text().split("；");
+        let desc = $(this).find(".def").text().split(/；|，/);
 
         paraphrase.push({
           // 类型
@@ -283,7 +283,7 @@ function cacheData(path, savePath) {
             let ciyi = $(this)
               .find("td:nth-child(2) .de_li1.de_li3")
               .map(function () {
-                let ci = $(this).find(".b_regtxt").text().split(/;|,/);
+                let ci = $(this).find(".b_regtxt").text().split(/;|,|，/);
                 return ci;
               })
               .get();
@@ -311,9 +311,11 @@ function cacheData(path, savePath) {
           }
         );
         newjianyaoshiyi = Object.entries(newjianyaoshiyi).map((item) => {
+          let p = [...new Set(item[1] || [])]
+          p = p.sort()
           return {
             t: item[0],
-            p: item[1],
+            p,
           };
         });
 
